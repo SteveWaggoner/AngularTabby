@@ -1,12 +1,37 @@
-import {Injectable} from '@angular/core';
+import { Injectable} from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 import {Song} from './song';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+
+import {List} from 'immutable';
 
 @Injectable()
 export class SongService {
 
-  songs: Song[] = [];
-
   constructor() {
+    this.loadInitialData();
+  }
+
+  private _selectedSong = new BehaviorSubject<Song>(null);
+  private _songs: BehaviorSubject<List<Song>> = new BehaviorSubject(List([]));
+
+  public readonly selectedSong: Observable<Song> = this._selectedSong.asObservable();
+  public readonly songs: Observable<List<Song>> = this._songs.asObservable();
+
+  public setSelectedSong(song: Song) {
+    this._selectedSong.next(song);
+  }
+
+  public addSong(song: Song) {
+    this._songs.next(this._songs.getValue().push(song));
+  }
+
+  public firstSong():Song {
+    return this._songs.getValue().first();
+  }
+
+  private loadInitialData() {
 
     const fur_elise = {
       'id': 1, 'title': 'Für Elise', 'bartime': 3000,
@@ -204,21 +229,17 @@ E||----------|--------------|--------------|--0-----------|--------------|
 `
     };
 
-    this.songs.push(fur_elise);
+
+    const ode_to_joy = {
+      'id': 2, 'title': 'Ode to Joy', 'bartime': 123,
+      'tabulature': 'xyz'
+    };
+
+    this.addSong(fur_elise);
+    this.addSong(ode_to_joy);
+
+    this.setSelectedSong(ode_to_joy);
 
   }
-
-
-  getAllSongs(): Song[] {
-    return this.songs;
-  }
-
-
-  getSongById(id: number): Song {
-    return this.songs
-      .filter(song => song.id === id)
-      .pop();
-  }
-
 
 }

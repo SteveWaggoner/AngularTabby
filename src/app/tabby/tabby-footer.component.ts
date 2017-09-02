@@ -1,15 +1,24 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {Song} from '../shared/song';
 
 @Component(
   {
     selector: 'app-tabby-footer',
-    template: `<P>Hello from Footer</P>`,
+    template: `<P>Hello from Footer</P>
+
+    <button (click)="handleClick($event)" type="button">
+      Click me
+    </button>
+    `,
     styleUrls: []
   }
 )
 export class TabbyFooterComponent {
 
-  constructor() {
+  @Input() className: string;
+  @Input() type: string;
+  @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
+
+  handleClick(event: any) {
+    this.onClick.emit(event);
   }
 }
