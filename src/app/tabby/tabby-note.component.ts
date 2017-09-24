@@ -9,8 +9,6 @@ import {PlayerService} from '../shared/player.service';
     styles: [`
 
       span.note {
-        /*color: blue;
-        background-color: transparent;*/
       }
 
       span.played {
@@ -19,7 +17,7 @@ import {PlayerService} from '../shared/player.service';
       span.played::before {
         content: '   ';
         z-index: -1;
-        background-image: url('../../assets/img/note-bkg.png');
+        background-image: url('/assets/img/note-bkg.png');
         background-repeat: no-repeat;
       }
 
