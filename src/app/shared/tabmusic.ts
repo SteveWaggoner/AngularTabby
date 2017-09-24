@@ -52,6 +52,7 @@ export class TabMusic {
     // init song
     this.lines = TabParser.parseTabulature(song.tabulature);
     this.steps = TabParser.generateStepTable(this.lines);
+    this.barTime = song.bartime;
 
 
     console.log("generateStepTable " + this.steps)
