@@ -33,31 +33,31 @@ import {PlayerService} from '../shared/player.service';
       }
 
       a.playerButton.play img {
-        background: url('/assets/img/sprites.png') -4px -4px;
+        background: url('assets/img/sprites.png') -4px -4px;
       }
 
       a.playerButton.pause img {
-        background: url('/assets/img/sprites.png') -36px -4px;
+        background: url('assets/img/sprites.png') -36px -4px;
       }
 
       a.playerButton.stop img {
-        background: url('/assets/img/sprites.png') -4px 92px;
+        background: url('assets/img/sprites.png') -4px 92px;
       }
 
       a.playerButton.settings img {
-        background: url('/assets/img/sprites.png') -36px 60px;
+        background: url('assets/img/sprites.png') -36px 60px;
       }
 
       a.playerButton.play.disabled img {
-        background: url('/assets/img/sprites_gray.png') -4px -4px;
+        background: url('assets/img/sprites_gray.png') -4px -4px;
       }
 
       a.playerButton.pause.disabled img {
-        background: url('/assets/img/sprites_gray.png') -36px -4px;
+        background: url('assets/img/sprites_gray.png') -36px -4px;
       }
 
       a.playerButton.stop.disabled img {
-        background: url('/assets/img/sprites_gray.png') -4px 92px;
+        background: url('assets/img/sprites_gray.png') -4px 92px;
       }
 
       a.playerButton.minimize,
@@ -67,15 +67,15 @@ import {PlayerService} from '../shared/player.service';
       }
 
       a.playerButton.minimize img {
-        background: url('/assets/img/sprites.png') -100px 92px;
+        background: url('assets/img/sprites.png') -100px 92px;
       }
 
       a.playerButton.window img {
-        background: url('/assets/img/sprites.png') -68px 92px;
+        background: url('assets/img/sprites.png') -68px 92px;
       }
 
       a.playerButton.maximize img {
-        background: url('/assets/img/sprites.png') -100px -4px;
+        background: url('assets/img/sprites.png') -100px -4px;
       }
 
       a img {
