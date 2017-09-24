@@ -15,8 +15,6 @@ import {TabbyMusicComponent} from './tabby/tabby-music.component';
 
 import {PlayerService} from './shared/player.service';
 
-import { EscapeHtmlPipe } from './shared/keep-html.pipe';
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -24,8 +22,7 @@ import { EscapeHtmlPipe } from './shared/keep-html.pipe';
     TabbyFooterComponent,
     TabbyNoteComponent,
     TabbyLineComponent,
-    TabbyMusicComponent,
-    EscapeHtmlPipe
+    TabbyMusicComponent
   ],
   imports: [
     BrowserModule,
