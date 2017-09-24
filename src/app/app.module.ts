@@ -6,24 +6,33 @@ import {HttpModule} from '@angular/http';
 import {AppComponent} from './app.component';
 
 import {TabbyHeaderComponent} from './tabby/tabby-header.component';
-import {TabbyBodyComponent} from './tabby/tabby-body.component';
 import {TabbyFooterComponent} from './tabby/tabby-footer.component';
 
-import {SongService} from './shared/song.service';
+import {TabbyNoteComponent} from './tabby/tabby-note.component';
+import {TabbyLineComponent} from './tabby/tabby-line.component';
+import {TabbyMusicComponent} from './tabby/tabby-music.component';
+
+
+import {PlayerService} from './shared/player.service';
+
+import { EscapeHtmlPipe } from './shared/keep-html.pipe';
 
 @NgModule({
   declarations: [
     AppComponent,
     TabbyHeaderComponent,
-    TabbyBodyComponent,
-    TabbyFooterComponent
+    TabbyFooterComponent,
+    TabbyNoteComponent,
+    TabbyLineComponent,
+    TabbyMusicComponent,
+    EscapeHtmlPipe
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpModule
   ],
-  providers: [SongService],
+  providers: [PlayerService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

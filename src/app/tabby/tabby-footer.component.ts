@@ -1,24 +1,20 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component} from '@angular/core';
+import {PlayerService} from '../shared/player.service';
 
 @Component(
   {
     selector: 'app-tabby-footer',
-    template: `<P>Hello from Footer</P>
-
-    <button (click)="handleClick($event)" type="button">
-      Click me
-    </button>
-    `,
-    styleUrls: []
+    template: `      
+    <p>NoteIndex: {{noteIndex}}</p>
+    `
   }
 )
 export class TabbyFooterComponent {
 
-  @Input() className: string;
-  @Input() type: string;
-  @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
-
-  handleClick(event: any) {
-    this.onClick.emit(event);
+  constructor(playerService: PlayerService) {
+    playerService.music.noteIndex$.subscribe((noteIndex) => {
+       this.noteIndex = noteIndex; });
   }
+
+  public noteIndex = -1;
 }

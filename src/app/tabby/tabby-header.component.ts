@@ -1,30 +1,42 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component} from '@angular/core';
 import {Song} from '../shared/song';
-import {SongService} from '../shared/song.service';
+
+import {List} from 'immutable';
+import {PlayerService} from '../shared/player.service';
 
 @Component(
   {
     selector: 'app-tabby-header',
-    template: `<P>Hello from Header</P>
+    template: `
+
+    <img src="assets/img/tabby_cat.png" alt="image" width="75" height="75">
 
     <select class="form-control" name="song" [(ngModel)]="selectedSong" (change)="onSongChange($event)">
-      <option *ngFor="let song of songService.songs | async" [ngValue]="song">{{song.title}}</option>
+      <option *ngFor="let song of songs " [ngValue]="song">{{song.title}}</option>
     </select>
-
     `
   }
 )
 export class TabbyHeaderComponent {
 
   selectedSong: Song = null;
+  songs: List<Song>;
 
-  constructor(public songService: SongService) {
-    songService.selectedSong.subscribe((value: Song) => {
+
+  constructor(public playerService: PlayerService) {
+    // on external changes..update user interface
+    playerService.music.song$.subscribe((value: Song) => {
       this.selectedSong = value;
+    });
+
+    playerService.songDb.songs$.subscribe((value: List<Song>) => {
+      this.songs = value;
     });
   }
 
   onSongChange(event: Event): void {
-    this.songService.setSelectedSong(this.selectedSong);
+
+    // on user interface changes..update the service
+    this.playerService.setSelectedSong(this.selectedSong);
   }
 }

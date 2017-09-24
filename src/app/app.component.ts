@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
-import {SongService} from './shared/song.service';
+
 import {Song} from './shared/song';
+import {PlayerService} from './shared/player.service';
 
 
 @Component({
@@ -8,31 +9,24 @@ import {Song} from './shared/song';
   template: `
     <section class="tabbyapp">
       <app-tabby-header></app-tabby-header>
-      <app-tabby-body></app-tabby-body>
+      <app-tabby-music></app-tabby-music>
       <app-tabby-footer (onClick)="blahblah()"></app-tabby-footer>
     </section>
   `,
-  providers: [SongService]
+  providers: [PlayerService]
 })
 export class AppComponent {
 
 
-  constructor(private songService: SongService) {
-    songService.selectedSong.subscribe((song: Song) => {
-      console.log('select song is ' + song.title);
-    });
+  constructor(private playerService: PlayerService) {
   }
 
 
   public blahblah() {
 
+    this.playerService.songDb.addSong( new Song('foo', 333, 'bar'));
 
-    this.songService.addSong({'id': 333, 'title': 'foo', 'bartime': 333, 'tabulature': 'bar'});
 
-    const fur = this.songService.firstSong()
-    this.songService.setSelectedSong(fur);
-
-    console.log(fur);
   }
 
 }

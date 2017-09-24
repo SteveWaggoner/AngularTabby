@@ -1,12 +1,14 @@
+
 export class Song {
 
-  id = 0;
   title = '';
   bartime = 0;
   tabulature = '';
 
-  // shallow copy constructor
-  constructor(values: Object = {}) {
-    Object.assign(this, values);
+   constructor(title: string, bartime: number, tabulature: string) {
+    this.title = title;
+    this.bartime = bartime;
+    this.tabulature = tabulature;
   }
+
 }

@@ -5,7 +5,7 @@ import { TestBed, async } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { SongService } from './shared/song.service';
+import { SongService } from './shared/song.db';
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
