@@ -8,18 +8,24 @@ export class Octave {
   public src: string;
   public noteName: string;
   private sound: any;
+  private isLoaded = false;
 
   constructor(public octave: number, public note: string, public dir: string) {
     this.noteName = octave + note.replace('#', 'sharp');
     this.src = dir + '/' + this.noteName + '.ogg';
 
     this.sound = new Howl({
-      src: [this.src]
+      src: [this.src],
+      preload: false
     });
 
   }
 
   public play(): number {
+    if ( ! this.isLoaded ) {
+      this.isLoaded = true;
+      this.sound.load();
+    }
     return this.sound.play();
   }
 
