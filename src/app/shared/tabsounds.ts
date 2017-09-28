@@ -1,12 +1,32 @@
+//
+// Howler.js
+//
+declare var Howl: any;
+
 export class Octave {
 
   public src: string;
   public noteName: string;
+  private sound: any;
 
   constructor(public octave: number, public note: string, public dir: string) {
     this.noteName = octave + note.replace('#', 'sharp');
     this.src = dir + '/' + this.noteName + '.ogg';
+
+    this.sound = new Howl({
+      src: [this.src]
+    });
+
   }
+
+  public play(): number {
+    return this.sound.play();
+  }
+
+  public volume(vol: number, playid: number) {
+    this.sound.volume(vol, playid);
+  }
+
 }
 
 export class Octaves {
@@ -39,7 +59,8 @@ export class Octaves {
 }
 
 export class AudioChannel {
-  public channel = new Audio();
+  public sound: any; // AudioInstance
+  public playid: number; // last Howl play id
   public finished = -1;  // expected end time for this channel
 }
 
@@ -99,10 +120,14 @@ export class Guitar implements Instrument {
     const noteName = this.getNote(stringIndex, fretValue);
     const octave = this.octaves.find(noteName);
 
+    /*
     for (let a = 0; a < this.audiochannels.length; a++) {
-      const cur_volume = this.audiochannels[a].channel.volume;
-      this.audiochannels[a].channel.volume = (cur_volume - .2) > 1 ? cur_volume - .2 : cur_volume;
+      if ( this.audiochannels[a].channel ) {
+        const cur_volume = this.audiochannels[a].channel.volume;
+        this.audiochannels[a].channel.volume = (cur_volume - .2) > 1 ? cur_volume - .2 : cur_volume;  // WHY???
+      }
     }
+    */
 
     let found = 0;
     for (let a = 0; a < this.audiochannels.length; a++) {
@@ -112,11 +137,11 @@ export class Guitar implements Instrument {
 
       if (chnl_time < cur_time) {			// is this channel finished?
         if (octave) {
+          this.audiochannels[a].sound = octave;
+          this.audiochannels[a].playid = octave.play()
 
-          this.audiochannels[a].channel.src = octave.src;
-          this.audiochannels[a].channel.load();
-          this.audiochannels[a].channel.volume = [0.4, 0.5, 0.6, 0.7, 0.9, 1.0][stringIndex];
-          this.audiochannels[a].channel.play();
+          const vol = [0.4, 0.5, 0.6, 0.7, 0.9, 1.0][stringIndex];
+          this.audiochannels[a].sound.volume(vol, this.audiochannels[a].playid)
 
           const max_duration = 10; // longest possible note is 5secs
 
