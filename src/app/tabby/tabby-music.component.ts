@@ -13,15 +13,12 @@ import {PlayerService} from '../shared/player.service';
       div.tabDisplay {
         font-size: 13px;
         font-family: monospace;
-        white-space: pre /* important !!! */
+        white-space: pre /* important !!! */ 
       }
-      
+
       div.tabPlayerControls {
-        margin-bottom: -13px;
         width: 100%;
-        /*font-size: 11px;*/
         background-color: #e0e0e0;
-        font-family: monospace;
       }
 
       a.playerButton img {
@@ -30,6 +27,7 @@ import {PlayerService} from '../shared/player.service';
         height: 24px;
         cursor: pointer;
         text-decoration: none;
+        display: inline-block; /* for firefox since img has no src */
       }
 
       a.playerButton.play img {
@@ -79,8 +77,7 @@ import {PlayerService} from '../shared/player.service';
       }
 
       a img {
-        border: none;
-        vertical-align: top;
+         vertical-align: top;
       }
 
       div.tabDisplay.minimize {

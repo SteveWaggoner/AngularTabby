@@ -98,7 +98,7 @@ export class Guitar implements Instrument {
     new GuitarString('E', 4)
   ];
 
-  channel_max = 200;
+  channel_max =100;
   private audiochannels: AudioChannel[] = [];
 
 

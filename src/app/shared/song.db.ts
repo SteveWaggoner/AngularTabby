@@ -261,7 +261,7 @@ E|--------|-------|-------|-------|---------|-------|-----------------|
 
 
     const twinkle_twinkle = new Song(
-      'Twinkle Twinkle', 3000,
+      'Twinkle Twinkle', 5000,
       `
     E|----------------|----------------|
     B|----------------|----------------|
@@ -406,10 +406,9 @@ E|--------|-------|-------|-------|---------|-------|-----------------|
 `
     );
 
-
+    this.addSong(london_bridge);
     this.addSong(fur_elise);
     this.addSong(ode_to_joy);
-    this.addSong(london_bridge);
     this.addSong(twinkle_twinkle);
     this.addSong(twinkle_twinkle2);
     this.addSong(mary_had_a_little_lamb);

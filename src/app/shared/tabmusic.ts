@@ -109,10 +109,17 @@ export class TabMusic {
 
   checkStep() {
 
+    // speed past whitespace
+    while (this.step >= 0 && this.step < this.stepCount && this.firstLine[this.step] === " ") {
+      console.log("skipping ws at" + this.step);
+      this.step++;
+    }
+
+
     const fretValue = this.firstLine[this.step];
     if (fretValue === '|' || ('EADGBe'.indexOf(fretValue) >= 0)) {
 
-      console.log("skipping leading chars")
+      console.log("skipping leading chars");
 
       const sub = this.firstLine.substring(this.step + 3);
       const barLength = sub.indexOf('|');
