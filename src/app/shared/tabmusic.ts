@@ -67,7 +67,7 @@ export class TabMusic {
         });
       }
     });
-    this.firstLine = this.firstLine.trim();
+
     this.stepCount = this.firstLine.length;
   }
 
@@ -77,7 +77,7 @@ export class TabMusic {
 
     this.noteIndex$.next(-1);
     this.step = -1;
-    this.configureInterval(this.BAR_LENGTH);
+    this.configureInterval(1000); // start in 1sec
   }
 
   configureInterval(newBarLength: number) {
@@ -97,8 +97,6 @@ export class TabMusic {
         const stepCharLength = this.playStep();
         this.step += stepCharLength;
 
-        console.log("step = " + this.step)
-
         // stop if at end
         if (this.step >= this.stepCount) {
           this.stop();
@@ -111,15 +109,12 @@ export class TabMusic {
 
     // speed past whitespace
     while (this.step >= 0 && this.step < this.stepCount && this.firstLine[this.step] === " ") {
-      console.log("skipping ws at" + this.step);
+      console.log("Step " + this.step + " skip ws");
       this.step++;
     }
 
-
     const fretValue = this.firstLine[this.step];
     if (fretValue === '|' || ('EADGBe'.indexOf(fretValue) >= 0)) {
-
-      console.log("skipping leading chars");
 
       const sub = this.firstLine.substring(this.step + 3);
       const barLength = sub.indexOf('|');
@@ -127,7 +122,10 @@ export class TabMusic {
         const stepCharLength = this.playStep();
         this.step += stepCharLength;
 
+        console.log("step "+this.step+" adjusting barLenth="+barLength+"  fretValue=" + fretValue)
         this.configureInterval(barLength);
+      } else {
+        console.log("step "+this.step+" leading chars: "+sub)
       }
     }
   }
@@ -138,6 +136,9 @@ export class TabMusic {
 
     if ( this.steps !== undefined && this.steps.has(this.step)) {
       const stepNotes = this.steps.get(this.step);
+
+      console.log("step " + this.step + " is several notes")
+
       stepNotes.forEach((note, i) => {
 
         if (note.fretValue >= 0) {
@@ -151,10 +152,14 @@ export class TabMusic {
 
           this.volume = .5;
 
+          console.log("  noteIndex="+this.noteIndex$.getValue()+"  "+note.text)
+
+        } else {
+          console.log("huh?");
         }
       });
     } else {
-      console.log('no step?');
+      console.log('step ' + this.step + " not a note");
     }
 
     return stepCharLength;

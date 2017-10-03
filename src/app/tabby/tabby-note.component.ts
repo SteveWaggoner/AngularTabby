@@ -46,6 +46,7 @@ export class TabbyNoteComponent  {
 
   constructor(playerService: PlayerService) {
     playerService.music.noteIndex$.subscribe((noteIndex) => { this.currentNoteIndex = noteIndex; } );
+    playerService.music.instrument$.subscribe( (instrument) => { if ( this.note ) { this.label = instrument.getNote(this.note.stringIndex, this.note.fretValue); } } );
   }
 
   setClasses() {
