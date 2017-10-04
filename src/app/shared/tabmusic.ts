@@ -1,16 +1,31 @@
-import {Guitar, Instrument} from './tabsounds';
+import {Instrument} from './tabsounds';
 import {Song} from './song';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import {TabParser} from './tabparser';
 import {Line} from './line';
+import {List} from "immutable";
+
+export class Speed {
+
+  constructor(private name: string, private barTime: number) {
+  }
+
+  public getName() {
+    return this.name
+  }
+
+  public getBarTime(): number {
+    return this.barTime;
+  }
+}
 
 
 export class TabMusic {
 
   public readonly song$ = new BehaviorSubject<Song>(null);
-
-  public instrument$ = new BehaviorSubject<Instrument>(new Guitar());
+  public instrument$ = new BehaviorSubject<Instrument>(null);
+  public speed$ = new BehaviorSubject<Speed>(null);
 
   public isPlaying$ = new BehaviorSubject<boolean>(false);
   public isPaused$ = new BehaviorSubject<boolean>(false);
@@ -34,17 +49,46 @@ export class TabMusic {
   constructor() {
     const me = this;
     this.song$.subscribe((song) => {
-      if ( song ) {
+      if (song) {
         me.loadSong(song);
       }
     });
 
-    this.isPaused$.subscribe((isPaused) => { this.isPaused = isPaused; });
+    this.isPaused$.subscribe((isPaused) => {
+      this.isPaused = isPaused;
+    });
+
+    this.speed$.next(this.speeds[0]);
+  }
+
+  private speeds = [new Speed("speed auto", -1),
+    new Speed("speed 300 - super fast", 300),
+    new Speed("speed 600", 600),
+    new Speed("speed 900", 900),
+    new Speed("speed 1500", 1500),
+    new Speed("speed 2000 - normal", 2000),
+    new Speed("speed 3000", 3000),
+    new Speed("speed 5000", 5000),
+    new Speed("speed 7000", 7000),
+    new Speed("speed 9000 - super slow", 9000)];
+
+  public getSpeeds() {
+    return this.speeds;
+  }
+
+  getBarTime(): number {
+
+    const speed = this.speed$.getValue()
+    if (speed && speed.getBarTime() > 0) {
+      return speed.getBarTime()
+    } else {
+      return this.barTime;
+    }
   }
 
   loadSong(song: Song) {
 
-    if ( ! song ) {
+    if (!song) {
       console.log("no song to load!?!?");
       return;
     }
@@ -52,6 +96,7 @@ export class TabMusic {
     // init song
     this.lines = TabParser.parseTabulature(song.tabulature);
     this.steps = TabParser.generateStepTable(this.lines);
+
     this.barTime = song.bartime;
 
 
@@ -80,6 +125,7 @@ export class TabMusic {
     this.configureInterval(1000); // start in 1sec
   }
 
+
   configureInterval(newBarLength: number) {
 
     if (this.interval) {
@@ -102,7 +148,7 @@ export class TabMusic {
           this.stop();
         }
       }
-    }, this.barTime / newBarLength);
+    }, this.getBarTime() / newBarLength);
   }
 
   checkStep() {
@@ -122,10 +168,10 @@ export class TabMusic {
         const stepCharLength = this.playStep();
         this.step += stepCharLength;
 
-        console.log("step "+this.step+" adjusting barLenth="+barLength+"  fretValue=" + fretValue)
+        console.log("step " + this.step + " adjusting barLenth=" + barLength + "  fretValue=" + fretValue)
         this.configureInterval(barLength);
       } else {
-        console.log("step "+this.step+" leading chars: "+sub)
+        console.log("step " + this.step + " leading chars: " + sub)
       }
     }
   }
@@ -134,7 +180,7 @@ export class TabMusic {
   playStep() {
     let stepCharLength = 1;
 
-    if ( this.steps !== undefined && this.steps.has(this.step)) {
+    if (this.steps !== undefined && this.steps.has(this.step)) {
       const stepNotes = this.steps.get(this.step);
 
       console.log("step " + this.step + " is several notes")
@@ -152,7 +198,7 @@ export class TabMusic {
 
           this.volume = .5;
 
-          console.log("  noteIndex="+this.noteIndex$.getValue()+"  "+note.text)
+          console.log("  noteIndex=" + this.noteIndex$.getValue() + "  " + note.text)
 
         } else {
           console.log("huh?");

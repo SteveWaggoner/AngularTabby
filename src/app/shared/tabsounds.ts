@@ -3,21 +3,26 @@
 //
 declare var Howl: any;
 
+
 export class Octave {
 
   public src: string;
-  public noteName: string;
   private sound: any;
   private isLoaded = false;
 
-  constructor(public octave: number, public note: string, public dir: string) {
-    this.noteName = octave + note.replace('#', 'sharp');
-    this.src = dir + '/' + this.noteName + '.ogg';
+  public noteName: string;
+
+  constructor(public octave: number, public note: string, toSource: (octave: number, note: string) => string) {
+    this.noteName = note+octave;
+
+    this.src = toSource(octave, note);
 
     this.sound = new Howl({
       src: [this.src],
       preload: false
     });
+
+    console.log(this.noteName+" == "+this.src);
 
   }
 
@@ -41,14 +46,14 @@ export class Octaves {
   private octavesArr: Octave[] = [];
   private notes: string[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
-  constructor(dir: string) {
-    this.initializeOctaves(dir);
+  constructor(toSource: (octave: number, note: string) => string) {
+    this.initializeOctaves(toSource);
   }
 
-  initializeOctaves(dir: string) {
+  private initializeOctaves(toSource: (octave: number, note: string) => string) {
     for (let i = 1; i <= 4; i++) {
       this.notes.forEach((note: string, index: number) => {
-        const octave = new Octave(i, note, dir);
+        const octave = new Octave(i, note, toSource);
         this.octavesMap[octave.noteName] = octave;
         this.octavesArr.push(octave);
       });
@@ -58,6 +63,7 @@ export class Octaves {
   find(noteName: string): Octave {
     return this.octavesMap[noteName];
   }
+
 
   get (index: number): Octave {
     return this.octavesArr[index];
@@ -71,36 +77,29 @@ export class AudioChannel {
 }
 
 export class GuitarString {
-
-  public currentNoteIndex = 0;
-
   constructor(public openString: string, public octaveNoteIndex: number) {
   }
-
 }
 
 export interface Instrument {
+  getName(): string
   getOpenString(stringIndex: number): string;
   getNote(stringIndex: number, fretValue: number): string;
   playSound(stringIndex: number, fretValue: number, volume: number);
 }
 
-export class Guitar implements Instrument {
+export abstract class BaseInstrument implements Instrument {
 
-  private octaves = new Octaves('assets/sounds/piano');
+  constructor() {
+    this.initializeAudioChannels();
+  }
 
-  private guitarStrings = [
-    new GuitarString('e', 28),
-    new GuitarString('B', 23),
-    new GuitarString('G', 19),
-    new GuitarString('D', 14),
-    new GuitarString('A', 9),
-    new GuitarString('E', 4)
-  ];
+  abstract getName(): string;
+  abstract getString(stringIndex: number): GuitarString;
+  abstract getOctaves(): Octaves;
 
-  channel_max =100;
+  private channel_max = 100;
   private audiochannels: AudioChannel[] = [];
-
 
   private initializeAudioChannels() {
     for (let a = 0; a < this.channel_max; a++) {									// prepare the channels
@@ -108,32 +107,29 @@ export class Guitar implements Instrument {
     }
   }
 
-  constructor() {
-    this.initializeAudioChannels();
-  }
-
   public getOpenString(stringIndex: number): string {
-    return this.guitarStrings[stringIndex].openString;
+    return this.getString(stringIndex).openString;
   }
 
   public getNote(stringIndex: number, fretValue: number): string {
-    return this.octaves.get(this.guitarStrings[stringIndex].octaveNoteIndex + fretValue).noteName;
-  }
 
+    const gstring = this.getString(stringIndex);
+    if (gstring) {
+      const octave = this.getOctaves().get(gstring.octaveNoteIndex + fretValue);
+      if (octave) {
+        return octave.noteName;
+      } else {
+        return '';
+      }
+    } else {
+      return ''
+    }
+  }
 
   public playSound(stringIndex: number, fretValue: number, volume: number) {
 
     const noteName = this.getNote(stringIndex, fretValue);
-    const octave = this.octaves.find(noteName);
-
-    /*
-    for (let a = 0; a < this.audiochannels.length; a++) {
-      if ( this.audiochannels[a].channel ) {
-        const cur_volume = this.audiochannels[a].channel.volume;
-        this.audiochannels[a].channel.volume = (cur_volume - .2) > 1 ? cur_volume - .2 : cur_volume;  // WHY???
-      }
-    }
-    */
+    const octave = this.getOctaves().find(noteName);
 
     let found = 0;
     for (let a = 0; a < this.audiochannels.length; a++) {
@@ -163,3 +159,5 @@ export class Guitar implements Instrument {
     }
   }
 }
+
+
