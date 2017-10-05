@@ -23,15 +23,24 @@ export class InstrumentDb {
 
   private loadInitialData() {
     this.addInstrument(new Guitar());
-    this.addInstrument(new Ukelele());
+    this.addInstrument(new Ukulele());
   }
 
 }
 
 
-export class Ukelele extends BaseInstrument implements Instrument {
+export class Ukulele extends BaseInstrument implements Instrument {
 
-  toSource(octave: number, note: string): string {
+  private octaves = new Octaves(this.toSource);
+
+  private guitarStrings = [
+    new GuitarString('A', 9),
+    new GuitarString('E', 4),
+    new GuitarString('C', 0),
+    new GuitarString('g', 7),
+  ];
+
+  toSource(octave: number, note: string): string[] {
     const noteName = octave + note;
 
     const lu = {
@@ -57,21 +66,14 @@ export class Ukelele extends BaseInstrument implements Instrument {
 
     const label = lu[noteName]
 
-    console.log(noteName + " => " + label)
+    console.log(noteName + ' => ' + label)
 
-    return 'assets/sounds/ukelele/SUke' + label + '.mp3';
+    return ['assets/sounds/ukulele/SUke' + label + '.webm', 'assets/sounds/ukulele/SUke' + label + '.mp3'];
   }
-  private octaves = new Octaves(this.toSource);
 
-  private guitarStrings = [
-    new GuitarString('A', 9),
-    new GuitarString('E', 4),
-    new GuitarString('C', 0),
-    new GuitarString('g', 7),
-  ];
 
   public getName(): string {
-    return "Ukelele";
+    return "Ukulele";
   }
 
   public getOctaves(): Octaves {
@@ -86,9 +88,9 @@ export class Ukelele extends BaseInstrument implements Instrument {
 
 export class Guitar extends BaseInstrument implements Instrument {
 
-  toSource(octave: number, note: string): string {
+  toSource(octave: number, note: string): string[] {
     const safe_noteName = octave + note.replace('#', 'sharp');
-    return 'assets/sounds/piano/' + safe_noteName + '.ogg';
+    return ['assets/sounds/guitar/' + safe_noteName + '.webm', 'assets/sounds/guitar/' + safe_noteName + '.mp3'];
   }
   private octaves = new Octaves(this.toSource);
 

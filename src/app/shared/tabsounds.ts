@@ -6,19 +6,19 @@ declare var Howl: any;
 
 export class Octave {
 
-  public src: string;
+  public src: string[];
   private sound: any;
   private isLoaded = false;
 
   public noteName: string;
 
-  constructor(public octave: number, public note: string, toSource: (octave: number, note: string) => string) {
-    this.noteName = note+octave;
+  constructor(public octave: number, public note: string, toSource: (octave: number, note: string) => string[]) {
+    this.noteName = note + octave;
 
     this.src = toSource(octave, note);
 
     this.sound = new Howl({
-      src: [this.src],
+      src: this.src,
       preload: false
     });
 
@@ -46,11 +46,11 @@ export class Octaves {
   private octavesArr: Octave[] = [];
   private notes: string[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
-  constructor(toSource: (octave: number, note: string) => string) {
+  constructor(toSource: (octave: number, note: string) => string[]) {
     this.initializeOctaves(toSource);
   }
 
-  private initializeOctaves(toSource: (octave: number, note: string) => string) {
+  private initializeOctaves(toSource: (octave: number, note: string) => string[]) {
     for (let i = 1; i <= 4; i++) {
       this.notes.forEach((note: string, index: number) => {
         const octave = new Octave(i, note, toSource);
