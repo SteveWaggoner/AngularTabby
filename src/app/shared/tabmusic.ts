@@ -1,4 +1,4 @@
-import {Instrument} from './tabsounds';
+import {GuitarString, Instrument} from './tabsounds';
 import {Song} from './song';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
@@ -6,17 +6,13 @@ import {TabParser} from './tabparser';
 import {Line} from './line';
 import {List} from "immutable";
 
+export class Tuning {
+  constructor(public readonly name: string, public readonly guitarStrings: GuitarString[]) {
+  }
+}
+
 export class Speed {
-
-  constructor(private name: string, private barTime: number) {
-  }
-
-  public getName() {
-    return this.name
-  }
-
-  public getBarTime(): number {
-    return this.barTime;
+  constructor(public readonly name: string, public readonly barTime: number) {
   }
 }
 
@@ -25,6 +21,7 @@ export class TabMusic {
 
   public readonly song$ = new BehaviorSubject<Song>(null);
   public instrument$ = new BehaviorSubject<Instrument>(null);
+  public tuning$ = new BehaviorSubject<Tuning>(null);
   public speed$ = new BehaviorSubject<Speed>(null);
 
   public isPlaying$ = new BehaviorSubject<boolean>(false);
@@ -33,7 +30,7 @@ export class TabMusic {
   public noteIndex$ = new BehaviorSubject<number>(-1);
 
   private interval = undefined;
-  private volume = 1;
+//  private volume = 1;
   private barTime = 3000; // speed of music
   private BAR_LENGTH = 18;   // how many steps in a bar?
 
@@ -58,10 +55,50 @@ export class TabMusic {
       this.isPaused = isPaused;
     });
 
+    this.tuning$.next(this.tunings[0]);
     this.speed$.next(this.speeds[0]);
   }
 
-  private speeds = [new Speed("speed auto", -1),
+  public readonly tunings = [
+
+    new Tuning('tuning EADGBE (Guitar)', [
+      new GuitarString('e', 28),
+      new GuitarString('B', 23),
+      new GuitarString('G', 19),
+      new GuitarString('D', 14),
+      new GuitarString('A', 9),
+      new GuitarString('E', 4)
+    ]),
+
+    new Tuning('tuning GCEA (Ukulele high-G)', [
+      new GuitarString('A', 9),
+      new GuitarString('E', 4),
+      new GuitarString('C', 0),
+      new GuitarString('g', 7),
+    ]),
+
+    new Tuning('tuning GCEA (Ukulele low-G)', [
+      new GuitarString('A', 9 + 12),
+      new GuitarString('E', 4 + 12),
+      new GuitarString('C', 0 + 12),
+      new GuitarString('g', 7),
+    ]),
+
+    new Tuning('tuning DGBE (Baritone Ukulele)', [
+      new GuitarString('e', 28),
+      new GuitarString('B', 23),
+      new GuitarString('G', 19),
+      new GuitarString('D', 14),
+    ]),
+    new Tuning('tuning DGBE (Baritone Ukulele 2)', [
+      new GuitarString('e', 28 - 12),
+      new GuitarString('B', 23 - 12),
+      new GuitarString('G', 19 - 12),
+      new GuitarString('D', 14 - 12),
+    ]),
+  ];
+
+  public readonly speeds = [new Speed("speed auto", -1),
     new Speed("speed 300 - super fast", 300),
     new Speed("speed 600", 600),
     new Speed("speed 900", 900),
@@ -72,15 +109,12 @@ export class TabMusic {
     new Speed("speed 7000", 7000),
     new Speed("speed 9000 - super slow", 9000)];
 
-  public getSpeeds() {
-    return this.speeds;
-  }
 
   getBarTime(): number {
 
     const speed = this.speed$.getValue()
-    if (speed && speed.getBarTime() > 0) {
-      return speed.getBarTime()
+    if (speed && speed.barTime > 0) {
+      return speed.barTime;
     } else {
       return this.barTime;
     }
@@ -183,7 +217,7 @@ export class TabMusic {
     if (this.steps !== undefined && this.steps.has(this.step)) {
       const stepNotes = this.steps.get(this.step);
 
-      console.log("step " + this.step + " is several notes")
+      console.log('step ' + this.step + ' is several notes')
 
       stepNotes.forEach((note, i) => {
 
@@ -194,18 +228,18 @@ export class TabMusic {
           }
 
           this.noteIndex$.next(this.noteIndex$.getValue() + 1);
-          this.instrument$.getValue().playSound(note.stringIndex, note.fretValue, this.volume);
+          const tuning = this.tuning$.getValue();
+          const instrument = this.instrument$.getValue();
+          instrument.playSound(tuning, note.stringIndex, note.fretValue);
 
-          this.volume = .5;
-
-          console.log("  noteIndex=" + this.noteIndex$.getValue() + "  " + note.text)
+          console.log('  noteIndex=' + this.noteIndex$.getValue() + '  ' + note.text);
 
         } else {
-          console.log("huh?");
+          console.log('huh?');
         }
       });
     } else {
-      console.log('step ' + this.step + " not a note");
+      console.log('step ' + this.step + ' not a note');
     }
 
     return stepCharLength;

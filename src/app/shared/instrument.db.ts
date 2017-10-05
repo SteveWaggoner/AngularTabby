@@ -2,7 +2,7 @@ import { Observable } from 'rxjs/Observable';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import {List} from 'immutable';
-import {BaseInstrument, GuitarString, Instrument, Octaves} from "./tabsounds";
+import {Instrument, Octaves} from "./tabsounds";
 
 export class InstrumentDb {
 
@@ -29,16 +29,12 @@ export class InstrumentDb {
 }
 
 
-export class Ukulele extends BaseInstrument implements Instrument {
+export class Ukulele extends Instrument {
 
+  constructor() {
+    super("Ukulele");
+  }
   private octaves = new Octaves(this.toSource);
-
-  private guitarStrings = [
-    new GuitarString('A', 9),
-    new GuitarString('E', 4),
-    new GuitarString('C', 0),
-    new GuitarString('g', 7),
-  ];
 
   toSource(octave: number, note: string): string[] {
     const noteName = octave + note;
@@ -71,48 +67,28 @@ export class Ukulele extends BaseInstrument implements Instrument {
     return ['assets/sounds/ukulele/SUke' + label + '.webm', 'assets/sounds/ukulele/SUke' + label + '.mp3'];
   }
 
-
-  public getName(): string {
-    return "Ukulele";
-  }
-
   public getOctaves(): Octaves {
     return this.octaves;
-  }
-
-  public getString(stringIndex:number): GuitarString {
-    return this.guitarStrings[stringIndex];
   }
 }
 
 
-export class Guitar extends BaseInstrument implements Instrument {
+export class Guitar extends Instrument {
 
-  toSource(octave: number, note: string): string[] {
-    const safe_noteName = octave + note.replace('#', 'sharp');
-    return ['assets/sounds/guitar/' + safe_noteName + '.webm', 'assets/sounds/guitar/' + safe_noteName + '.mp3'];
-  }
   private octaves = new Octaves(this.toSource);
 
-  private guitarStrings = [
-    new GuitarString('e', 28),
-    new GuitarString('B', 23),
-    new GuitarString('G', 19),
-    new GuitarString('D', 14),
-    new GuitarString('A', 9),
-    new GuitarString('E', 4)
-  ];
+  constructor() {
+    super('Guitar');
+  }
 
-  public getName(): string {
-    return "Guitar";
+  private toSource(octave: number, note: string): string[] {
+    const safe_noteName = octave + note.replace('#', 'sharp');
+    return ['assets/sounds/guitar/' + safe_noteName + '.webm', 'assets/sounds/guitar/' + safe_noteName + '.mp3'];
   }
 
   public getOctaves(): Octaves {
     return this.octaves;
   }
 
-  public getString(stringIndex:number): GuitarString {
-    return this.guitarStrings[stringIndex];
-  }
 }
 

@@ -1,6 +1,8 @@
 //
 // Howler.js
 //
+import {Tuning} from "./tabmusic";
+
 declare var Howl: any;
 
 
@@ -22,7 +24,7 @@ export class Octave {
       preload: false
     });
 
-    console.log(this.noteName+" == "+this.src);
+    console.log(this.noteName + ' == ' + this.src);
 
   }
 
@@ -81,25 +83,17 @@ export class GuitarString {
   }
 }
 
-export interface Instrument {
-  getName(): string
-  getOpenString(stringIndex: number): string;
-  getNote(stringIndex: number, fretValue: number): string;
-  playSound(stringIndex: number, fretValue: number, volume: number);
-}
 
-export abstract class BaseInstrument implements Instrument {
-
-  constructor() {
-    this.initializeAudioChannels();
-  }
-
-  abstract getName(): string;
-  abstract getString(stringIndex: number): GuitarString;
-  abstract getOctaves(): Octaves;
+export abstract class Instrument {
 
   private channel_max = 100;
   private audiochannels: AudioChannel[] = [];
+
+  constructor(public readonly name: string) {
+    this.initializeAudioChannels();
+  }
+
+  abstract getOctaves(): Octaves;
 
   private initializeAudioChannels() {
     for (let a = 0; a < this.channel_max; a++) {									// prepare the channels
@@ -107,13 +101,10 @@ export abstract class BaseInstrument implements Instrument {
     }
   }
 
-  public getOpenString(stringIndex: number): string {
-    return this.getString(stringIndex).openString;
-  }
 
-  public getNote(stringIndex: number, fretValue: number): string {
+  public getNote(tuning: Tuning, stringIndex: number, fretValue: number): string {
 
-    const gstring = this.getString(stringIndex);
+    const gstring = tuning.guitarStrings[stringIndex];
     if (gstring) {
       const octave = this.getOctaves().get(gstring.octaveNoteIndex + fretValue);
       if (octave) {
@@ -122,13 +113,14 @@ export abstract class BaseInstrument implements Instrument {
         return '';
       }
     } else {
-      return ''
+      return '';
     }
   }
 
-  public playSound(stringIndex: number, fretValue: number, volume: number) {
+  public playSound(tuning: Tuning, stringIndex: number, fretValue: number) {
 
-    const noteName = this.getNote(stringIndex, fretValue);
+    const gstring = tuning.guitarStrings[stringIndex];
+    const noteName = this.getNote(tuning, stringIndex, fretValue);
     const octave = this.getOctaves().find(noteName);
 
     let found = 0;
@@ -140,10 +132,10 @@ export abstract class BaseInstrument implements Instrument {
       if (chnl_time < cur_time) {			// is this channel finished?
         if (octave) {
           this.audiochannels[a].sound = octave;
-          this.audiochannels[a].playid = octave.play()
+          this.audiochannels[a].playid = octave.play();
 
           const vol = [0.4, 0.5, 0.6, 0.7, 0.9, 1.0][stringIndex];
-          this.audiochannels[a].sound.volume(vol, this.audiochannels[a].playid)
+          this.audiochannels[a].sound.volume(vol, this.audiochannels[a].playid);
 
           const max_duration = 10; // longest possible note is 5secs
 

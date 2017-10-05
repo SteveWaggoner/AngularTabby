@@ -1,6 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Note} from '../shared/note';
 import {PlayerService} from '../shared/player.service';
+import {Tuning} from "../shared/tabmusic";
+import {Instrument} from "../shared/tabsounds";
 
 @Component(
   {
@@ -92,6 +94,8 @@ export class TabbyNoteComponent implements OnInit {
   label = '';
 
   currentNoteIndex = -1;
+  currentTuning: Tuning = null;
+  currentInstrument: Instrument = null;
 
   constructor(private playerService: PlayerService) {
   }
@@ -100,15 +104,26 @@ export class TabbyNoteComponent implements OnInit {
     this.playerService.music.noteIndex$.subscribe((noteIndex) => {
       this.currentNoteIndex = noteIndex;
     });
+
+    this.playerService.music.tuning$.subscribe((tuning) => {
+      this.currentTuning = tuning;
+      this.updateLabel();
+    });
+
     this.playerService.music.instrument$.subscribe((instrument) => {
-      if (this.note && this.note.stringIndex >= 0 && this.note.fretValue !== undefined ) {
-        this.label = instrument.getNote(this.note.stringIndex, this.note.fretValue);
-      }
+      this.currentInstrument = instrument;
+      this.updateLabel();
     });
   }
 
-  playNote(event:any) {
-    this.playerService.music.instrument$.getValue().playSound(this.note.stringIndex, this.note.fretValue, 1);
+  private updateLabel() {
+    if (this.currentInstrument && this.currentTuning && this.note && this.note.stringIndex >= 0 && this.note.fretValue !== undefined ) {
+      this.label = this.currentInstrument.getNote(this.currentTuning, this.note.stringIndex, this.note.fretValue);
+    }
+  }
+
+  playNote(event: any) {
+    this.currentInstrument.playSound(this.currentTuning, this.note.stringIndex, this.note.fretValue);
   }
 
   setClasses() {
