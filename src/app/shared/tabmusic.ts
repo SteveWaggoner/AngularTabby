@@ -4,7 +4,6 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import {TabParser} from './tabparser';
 import {Line} from './line';
-import {List} from "immutable";
 
 export class Tuning {
   constructor(public readonly name: string, public readonly guitarStrings: GuitarString[]) {
@@ -30,7 +29,7 @@ export class TabMusic {
   public noteIndex$ = new BehaviorSubject<number>(-1);
 
   private interval = undefined;
-//  private volume = 1;
+
   private barTime = 3000; // speed of music
   private BAR_LENGTH = 18;   // how many steps in a bar?
 
@@ -40,6 +39,7 @@ export class TabMusic {
 
   private step = 0;
   private stepCount = 0;
+  private tuningName = 'xx';
 
   private isPaused = false;
 
@@ -98,16 +98,16 @@ export class TabMusic {
     ]),
   ];
 
-  public readonly speeds = [new Speed("speed auto", -1),
-    new Speed("speed 300 - super fast", 300),
-    new Speed("speed 600", 600),
-    new Speed("speed 900", 900),
-    new Speed("speed 1500", 1500),
-    new Speed("speed 2000 - normal", 2000),
-    new Speed("speed 3000", 3000),
-    new Speed("speed 5000", 5000),
-    new Speed("speed 7000", 7000),
-    new Speed("speed 9000 - super slow", 9000)];
+  public readonly speeds = [new Speed('speed auto', -1),
+    new Speed('speed 300 - super fast', 300),
+    new Speed('speed 600', 600),
+    new Speed('speed 900', 900),
+    new Speed('speed 1500', 1500),
+    new Speed('speed 2000 - normal', 2000),
+    new Speed('speed 3000', 3000),
+    new Speed('speed 5000', 5000),
+    new Speed('speed 7000', 7000),
+    new Speed('speed 9000 - super slow', 9000)];
 
 
   getBarTime(): number {
@@ -123,15 +123,35 @@ export class TabMusic {
   loadSong(song: Song) {
 
     if (!song) {
-      console.log("no song to load!?!?");
+      console.log('no song to load!?!?');
       return;
     }
 
     // init song
     this.lines = TabParser.parseTabulature(song.tabulature);
     this.steps = TabParser.generateStepTable(this.lines);
-
     this.barTime = song.bartime;
+
+    // switch tuning to match song
+    this.tuningName = TabParser.parseTuning(song.tabulature);
+
+    console.log('tuningName for ' + song.title + ' is ' + this.tuningName)
+
+    if ( this.tuningName.length > 0 ) {
+      this.tunings.forEach((tuning, n) => {
+
+        if ( this.tuning$.getValue().name.indexOf(this.tuningName) === -1) {
+
+          if (tuning.name.indexOf(this.tuningName) >= 0) {
+
+            console.log('switch to ' + tuning.name);
+
+            this.tuning$.next(tuning);
+          }
+        }
+
+      });
+    }
 
 
     console.log("generateStepTable " + this.steps)

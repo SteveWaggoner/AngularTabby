@@ -117,11 +117,27 @@ export abstract class Instrument {
     }
   }
 
+  public isBadNote(tuning: Tuning, stringIndex: number, fretValue: number): boolean {
+    const gstring = tuning.guitarStrings[stringIndex];
+    if (gstring) {
+      const octave = this.getOctaves().get(gstring.octaveNoteIndex + fretValue);
+      if (octave && octave.src.length > 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public playSound(tuning: Tuning, stringIndex: number, fretValue: number) {
 
     const gstring = tuning.guitarStrings[stringIndex];
     const noteName = this.getNote(tuning, stringIndex, fretValue);
     const octave = this.getOctaves().find(noteName);
+
+    if ( this.isBadNote(tuning, stringIndex, fretValue) ) {
+      console.log("skipping playing bad note!");
+      return;
+    }
 
     let found = 0;
     for (let a = 0; a < this.audiochannels.length; a++) {

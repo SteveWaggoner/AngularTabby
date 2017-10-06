@@ -61,10 +61,12 @@ export class Ukulele extends Instrument {
     };
 
     const label = lu[noteName]
-
-    console.log(noteName + ' => ' + label)
-
-    return ['assets/sounds/ukulele/SUke' + label + '.webm', 'assets/sounds/ukulele/SUke' + label + '.mp3'];
+    if ( label !== undefined ) {
+      console.log(noteName + ' => ' + label)
+      return ['assets/sounds/ukulele/SUke' + label + '.webm', 'assets/sounds/ukulele/SUke' + label + '.mp3'];
+    } else {
+      return [];
+    }
   }
 
   public getOctaves(): Octaves {

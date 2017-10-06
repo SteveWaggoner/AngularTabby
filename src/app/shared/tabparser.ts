@@ -15,6 +15,29 @@ export class TabParser {
     return notes;
   }
 
+  static parseTuning(tab: string): string {
+
+    const lines = tab.split('\n');
+
+    let tuning = '';
+    let done = false;
+
+    lines.forEach((line, lineIndex) => {
+      const lineHasNotes = line.indexOf('-') >= 0 && line.indexOf('|') >= 0;
+      if (lineHasNotes) {
+
+        if ('abcdefgABCDEFG'.indexOf(line.trim()[0]) >= 0 && !done) {
+          tuning = line.trim()[0].toUpperCase() + tuning;
+        }
+      } else {
+        if (tuning.length > 0) {
+          done = true;
+        }
+      }
+    });
+    return tuning;
+  }
+
   static parseTabulature(tab: string): Line[] {
 
     const lines = tab.split('\n');
@@ -23,6 +46,7 @@ export class TabParser {
     let tabStripIndex = -1;
     let stringIndex = -1;
 
+    let tuning = '';
 
     const parsedLines: Line[] = [];
 
@@ -30,6 +54,10 @@ export class TabParser {
 
       const lineHasNotes = line.indexOf('-') >= 0 && line.indexOf('|') >= 0;
       if (lineHasNotes) {
+
+        if ( 'abcdefgABCDEFG'.indexOf(line.trim()[0])) {
+          tuning = line.trim()[0].toUpperCase() + tuning;
+        }
 
         const firstLineInStrip = !inStrip;
         inStrip = true;
