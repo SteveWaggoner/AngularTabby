@@ -47,7 +47,17 @@ import {Instrument, Tuning} from '../shared/tabsounds';
 
       /*This will work for Chrome on iPad */
       span.played.onedigit.chrome_ios::before {
-        margin: 0 -17px 0 -21px;
+        margin: 0 -17px 0 -18.4px; 
+      }
+
+      /*This will work for Chrome on android phone */
+      span.played.onedigit.chrome_android::before {
+        margin: 0 -17px 0 -18.4px; 
+      }
+
+      /*This will work for Safari on iPad */
+      span.played.onedigit.safari_ipad::before {
+        margin: 0 -17px 0 -18.4px; 
       }
 
       span.played.twodigit::before {
@@ -154,6 +164,8 @@ export class TabbyNoteComponent implements OnInit {
       'firefox': navigator.userAgent.toLowerCase().indexOf('firefox') > -1,
       'ie': !!navigator.userAgent.match(/Trident\/7\./),
       'chrome_ios': navigator.userAgent.indexOf('CriOS') > -1,
+      'chrome_android': navigator.userAgent.indexOf('Android') > -1 && navigator.userAgent.indexOf('Chrome') > -1, 
+      'safari_ipad': navigator.userAgent.indexOf('iPad') > -1 && navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('CriOS') == -1
     };
     return classes;
   }
