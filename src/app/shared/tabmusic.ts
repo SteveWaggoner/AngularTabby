@@ -103,7 +103,7 @@ export class TabMusic {
 
   getBarTime(): number {
 
-    const speed = this.speed$.getValue()
+    const speed = this.speed$.getValue();
     if (speed && speed.barTime > 0) {
       return speed.barTime;
     } else {
@@ -126,7 +126,7 @@ export class TabMusic {
     // switch tuning to match song
     this.tuningName = TabParser.parseTuning(song.tabulature);
 
-    console.log('tuningName for ' + song.title + ' is ' + this.tuningName)
+    console.log('tuningName for ' + song.title + ' is ' + this.tuningName);
 
     if ( this.tuningName.length > 0 ) {
       this.tunings.forEach((tuning, n) => {
@@ -145,7 +145,7 @@ export class TabMusic {
     }
 
 
-    console.log("generateStepTable " + this.steps)
+    console.log('generateStepTable ' + this.steps);
 
     // calculate total steps
     this.stepCount = 0;
@@ -185,8 +185,7 @@ export class TabMusic {
         this.checkStep();
 
         // play next step (if is a note)
-        const stepCharLength = this.playStep();
-        this.step += stepCharLength;
+        this.step += this.playStep();
 
         // stop if at end
         if (this.step >= this.stepCount) {
@@ -199,8 +198,8 @@ export class TabMusic {
   checkStep() {
 
     // speed past whitespace
-    while (this.step >= 0 && this.step < this.stepCount && this.firstLine[this.step] === " ") {
-      console.log("Step " + this.step + " skip ws");
+    while (this.step >= 0 && this.step < this.stepCount && this.firstLine[this.step] === ' ') {
+      console.log('Step ' + this.step + ' skip ws');
       this.step++;
     }
 
@@ -210,13 +209,12 @@ export class TabMusic {
       const sub = this.firstLine.substring(this.step + 3);
       const barLength = sub.indexOf('|');
       if (barLength > 0) {
-        const stepCharLength = this.playStep();
-        this.step += stepCharLength;
+        this.step += this.playStep();
 
-        console.log("step " + this.step + " adjusting barLenth=" + barLength + "  fretValue=" + fretValue)
+        console.log('step ' + this.step + ' adjusting barLenth=' + barLength + '  fretValue=' + fretValue);
         this.configureInterval(barLength);
       } else {
-        console.log("step " + this.step + " leading chars: " + sub)
+        console.log('step ' + this.step + ' leading chars: ' + sub);
       }
     }
   }
@@ -228,7 +226,7 @@ export class TabMusic {
     if (this.steps !== undefined && this.steps.has(this.step)) {
       const stepNotes = this.steps.get(this.step);
 
-      console.log('step ' + this.step + ' is several notes')
+      console.log('step ' + this.step + ' is several notes');
 
       stepNotes.forEach((note, i) => {
 
@@ -245,7 +243,7 @@ export class TabMusic {
 
           const noteName = instrument.getMusicalNotes().getNoteName(tuning, note.stringIndex, note.fretValue);
           const vol = [0.4, 0.5, 0.6, 0.7, 0.9, 1.0][note.stringIndex];
-          instrument.playSound(noteName, vol)
+          instrument.playSound(noteName, vol);
 
           console.log('  noteIndex=' + this.noteIndex$.getValue() + '  ' + note.text);
 

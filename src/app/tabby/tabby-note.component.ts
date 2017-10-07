@@ -21,8 +21,7 @@ import {Instrument, Tuning} from '../shared/tabsounds';
       span.played::before {
         content: '   ';
         z-index: -1;
-        background-image: url('assets/img/note-bkg.png');
-        background-repeat: no-repeat;
+        background: url('assets/img/note-bkg.png') no-repeat;
       }
 
       span.played.bad::before {
@@ -47,17 +46,17 @@ import {Instrument, Tuning} from '../shared/tabsounds';
 
       /*This will work for Chrome on iPad */
       span.played.onedigit.chrome_ios::before {
-        margin: 0 -17px 0 -18.4px; 
+        margin: 0 -17px 0 -18.4px;
       }
 
       /*This will work for Chrome on android phone */
       span.played.onedigit.chrome_android::before {
-        margin: 0 -17px 0 -18.4px; 
+        margin: 0 -17px 0 -18.4px;
       }
 
       /*This will work for Safari on iPad */
       span.played.onedigit.safari_ipad::before {
-        margin: 0 -17px 0 -18.4px; 
+        margin: 0 -17px 0 -18.4px;
       }
 
       span.played.twodigit::before {
@@ -97,9 +96,8 @@ import {Instrument, Tuning} from '../shared/tabsounds';
         top: 100%;
         left: 50%;
         margin-left: -5px;
-        border-width: 5px;
-        border-style: solid;
-        border-color: black transparent transparent transparent;
+        border: 5px solid transparent;
+        border-top-color: black;
       }
 
       .tooltip:hover .tooltiptext {
@@ -144,8 +142,6 @@ export class TabbyNoteComponent implements OnInit {
     if (this.currentInstrument && this.currentTuning && this.note && this.note.stringIndex >= 0 && this.note.fretValue !== undefined) {
       this.noteName = this.currentInstrument.getMusicalNotes().getNoteName(this.currentTuning, this.note.stringIndex, this.note.fretValue);
       this.badNote = this.currentInstrument.getMusicalNotes().getNote(this.noteName) === undefined;
-
-      console.log("component = " + this.noteName);
     }
   }
 
@@ -154,20 +150,21 @@ export class TabbyNoteComponent implements OnInit {
   }
 
   setClasses() {
-    const classes = {
+    return {
       'tooltip': this.note.fretValue >= 0,
       'note': this.note.fretValue >= 0,
       'played': this.note.fretValue >= 0 && this.note.index <= this.currentNoteIndex,
       'bad': this.badNote,
       'onedigit': this.note.digits === 1,
       'twodigit': this.note.digits === 2,
+
       'firefox': navigator.userAgent.toLowerCase().indexOf('firefox') > -1,
       'ie': !!navigator.userAgent.match(/Trident\/7\./),
       'chrome_ios': navigator.userAgent.indexOf('CriOS') > -1,
-      'chrome_android': navigator.userAgent.indexOf('Android') > -1 && navigator.userAgent.indexOf('Chrome') > -1, 
-      'safari_ipad': navigator.userAgent.indexOf('iPad') > -1 && navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('CriOS') == -1
+      'chrome_android': navigator.userAgent.indexOf('Android') > -1 && navigator.userAgent.indexOf('Chrome') > -1,
+      'safari_ipad': navigator.userAgent.indexOf('iPad') > -1 && navigator.userAgent.indexOf('Safari') > -1
+      && navigator.userAgent.indexOf('CriOS') === -1
     };
-    return classes;
   }
 
 }

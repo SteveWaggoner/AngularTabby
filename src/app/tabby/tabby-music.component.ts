@@ -13,7 +13,7 @@ import {PlayerService} from '../shared/player.service';
       div.tabDisplay {
         font-size: 13px;
         font-family: monospace;
-        white-space: pre /* important !!! */ 
+        white-space: pre /* important !!! */
       }
 
       div.tabPlayerControls {
@@ -92,16 +92,16 @@ import {PlayerService} from '../shared/player.service';
     `],
 
     template: `
-      <div class="tabPlayerControls">
-        <a class="playerButton play"  [ngClass]="{ 'disabled': playDisabled}" (click)="playerService.music.play()"><img></a>
-        <a class="playerButton pause" [ngClass]="{ 'disabled': pauseDisabled}" (click)="playerService.music.pause()"><img></a>
-        <a class="playerButton stop"  [ngClass]="{ 'disabled': stopDisabled}" (click)="playerService.music.stop()"><img></a>
-        <a class="playerButton minimize" (click)="resizeToMinimize()"><img></a>
-        <a class="playerButton window"   (click)="resizeToWindow()"><img></a>
-        <a class="playerButton maximize" (click)="resizeToMaximize()"><img></a>
-      </div>
-      <p>{{title}}</p>
-      <div class="tabDisplay" [ngClass]="{ 'window': window, 'minimize': minimize}" ><app-tabby-line *ngFor="let line of lines" [line]="line" ></app-tabby-line></div>
+    <div class="tabPlayerControls">
+      <a class="playerButton play"  [ngClass]="{ 'disabled': playDisabled}" (click)="playerService.music.play()"><img></a>
+      <a class="playerButton pause" [ngClass]="{ 'disabled': pauseDisabled}" (click)="playerService.music.pause()"><img></a>
+      <a class="playerButton stop"  [ngClass]="{ 'disabled': stopDisabled}" (click)="playerService.music.stop()"><img></a>
+      <a class="playerButton minimize" (click)="resizeToMinimize()"><img></a>
+      <a class="playerButton window"   (click)="resizeToWindow()"><img></a>
+      <a class="playerButton maximize" (click)="resizeToMaximize()"><img></a>
+    </div>
+    <p>{{title}}</p>
+    <div class="tabDisplay" [ngClass]="{ 'window': window, 'minimize': minimize}" ><app-tabby-line *ngFor="let line of lines" [line]="line" ></app-tabby-line></div>
 `
   }
 )

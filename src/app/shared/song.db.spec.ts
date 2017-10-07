@@ -13,16 +13,4 @@ describe('SongService', () => {
     expect(service).toBeTruthy();
   }));
 
-  /*
-  describe('#getAllTodos()', () => {
-
-    it('should return an empty array by default', inject([SongDb], (service: SongDb) => {
-      expect(service.getAllSongs()).toEqual([]);
-    }));
-
-
-
-  });
-*/
-
 });

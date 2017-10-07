@@ -1,6 +1,6 @@
 
 // Howler.js
-declare var Howl: any;
+declare const Howl: any;
 
 class MusicalNote {
 
@@ -51,7 +51,7 @@ export class MusicalNotes {
         const noteName = note + octave;
         const srcs = toSource(octave, note);
 
-        console.log("Loading notes " + noteName + " == " + srcs.length)
+        console.log('Loading notes ' + noteName + ' == ' + srcs.length);
 
         if ( srcs.length > 0) {
           this.noteMap.set(noteName, new MusicalNote(noteName, srcs));
@@ -119,10 +119,6 @@ export abstract class Instrument {
     for (let a = 0; a < this.channel_max; a++) {									// prepare the channels
       this.audiochannels.push(new AudioChannel());
     }
-  }
-
-  public getNote(tuning: Tuning, stringIndex: number, fretValue: number): string {
-    return this.getMusicalNotes().getNoteName(tuning, stringIndex, fretValue);
   }
 
   public playSound(noteName: string, volume: number) {

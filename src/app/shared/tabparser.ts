@@ -8,7 +8,7 @@ export class TabParser {
     const parts = line.split(/([0-9]+)/);
     let position = 0;
     parts.forEach((val, ndx) => {
-      const note = new Note(lineIndex, tabStripIndex, stringIndex, position, val)
+      const note = new Note(lineIndex, tabStripIndex, stringIndex, position, val);
       notes.push(note);
       position += val.length;
     });
@@ -73,7 +73,7 @@ export class TabParser {
         inStrip = false;
       }
 
-      const notes = TabParser.parseLine(lineIndex, tabStripIndex, stringIndex, line)
+      const notes = TabParser.parseLine(lineIndex, tabStripIndex, stringIndex, line);
       parsedLines.push(new Line(tabStripIndex, stringIndex, notes));
     });
 

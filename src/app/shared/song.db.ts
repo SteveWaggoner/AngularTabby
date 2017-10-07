@@ -516,7 +516,7 @@ const stairway_to_heaven_uke = new Song('Stairway to Heaven (uke low-g)', 2000,
     |---------------------|
 `);
 
-//https://ukulelescales.com/C-aeolian
+// https://ukulelescales.com/C-aeolian
     const c_aeolian_uke_gcea = new Song('C Aeolian Ukulele Scale (gCEA)', 2000,
       `
 A|-----------------1--3--|
