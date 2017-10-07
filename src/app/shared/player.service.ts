@@ -2,9 +2,9 @@ import {Injectable} from '@angular/core';
 
 import {SongDb} from './song.db';
 import {Song} from './song';
-import {Speed, TabMusic, Tuning} from './tabmusic';
+import {Speed, TabMusic} from './tabmusic';
 import {InstrumentDb} from './instrument.db';
-import {Instrument} from './tabsounds';
+import {Instrument, Tuning} from './tabsounds';
 
 
 @Injectable()

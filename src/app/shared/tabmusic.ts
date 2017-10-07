@@ -1,14 +1,10 @@
-import {GuitarString, Instrument} from './tabsounds';
+import {GuitarString, Instrument, Tuning} from './tabsounds';
 import {Song} from './song';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import {TabParser} from './tabparser';
 import {Line} from './line';
 
-export class Tuning {
-  constructor(public readonly name: string, public readonly guitarStrings: GuitarString[]) {
-  }
-}
 
 export class Speed {
   constructor(public readonly name: string, public readonly barTime: number) {
@@ -31,7 +27,7 @@ export class TabMusic {
   private interval = undefined;
 
   private barTime = 3000; // speed of music
-  private BAR_LENGTH = 18;   // how many steps in a bar?
+//  private BAR_LENGTH = 18;   // how many steps in a bar?
 
   private lines: Line[];
   private firstLine = '';
@@ -62,40 +58,35 @@ export class TabMusic {
   public readonly tunings = [
 
     new Tuning('tuning EADGBE (Guitar)', [
-      new GuitarString('e', 28),
-      new GuitarString('B', 23),
-      new GuitarString('G', 19),
-      new GuitarString('D', 14),
-      new GuitarString('A', 9),
-      new GuitarString('E', 4)
+      new GuitarString('e', 3),
+      new GuitarString('B', 2),
+      new GuitarString('G', 2),
+      new GuitarString('D', 2),
+      new GuitarString('A', 1),
+      new GuitarString('E', 1)
     ]),
 
     new Tuning('tuning GCEA (Ukulele high-G)', [
-      new GuitarString('A', 9),
-      new GuitarString('E', 4),
-      new GuitarString('C', 0),
-      new GuitarString('g', 7),
+      new GuitarString('A', 1),
+      new GuitarString('E', 1),
+      new GuitarString('C', 1),
+      new GuitarString('g', 1),
     ]),
 
     new Tuning('tuning GCEA (Ukulele low-G)', [
-      new GuitarString('A', 9 + 12),
-      new GuitarString('E', 4 + 12),
-      new GuitarString('C', 0 + 12),
-      new GuitarString('g', 7),
+      new GuitarString('A', 1),
+      new GuitarString('E', 1),
+      new GuitarString('C', 1),
+      new GuitarString('g', 0),
     ]),
 
     new Tuning('tuning DGBE (Baritone Ukulele)', [
-      new GuitarString('e', 28),
-      new GuitarString('B', 23),
-      new GuitarString('G', 19),
-      new GuitarString('D', 14),
+      new GuitarString('e', 2),
+      new GuitarString('B', 1),
+      new GuitarString('G', 1),
+      new GuitarString('D', 1),
     ]),
-    new Tuning('tuning DGBE (Baritone Ukulele 2)', [
-      new GuitarString('e', 28 - 12),
-      new GuitarString('B', 23 - 12),
-      new GuitarString('G', 19 - 12),
-      new GuitarString('D', 14 - 12),
-    ]),
+
   ];
 
   public readonly speeds = [new Speed('speed auto', -1),
@@ -248,9 +239,13 @@ export class TabMusic {
           }
 
           this.noteIndex$.next(this.noteIndex$.getValue() + 1);
-          const tuning = this.tuning$.getValue();
+
           const instrument = this.instrument$.getValue();
-          instrument.playSound(tuning, note.stringIndex, note.fretValue);
+          const tuning = this.tuning$.getValue();
+
+          const noteName = instrument.getMusicalNotes().getNoteName(tuning, note.stringIndex, note.fretValue);
+          const vol = [0.4, 0.5, 0.6, 0.7, 0.9, 1.0][note.stringIndex];
+          instrument.playSound(noteName, vol)
 
           console.log('  noteIndex=' + this.noteIndex$.getValue() + '  ' + note.text);
 

@@ -1,31 +1,20 @@
-//
-// Howler.js
-//
-import {Tuning} from "./tabmusic";
 
+// Howler.js
 declare var Howl: any;
 
+class MusicalNote {
 
-export class Octave {
-
-  public src: string[];
   private sound: any;
   private isLoaded = false;
 
-  public noteName: string;
-
-  constructor(public octave: number, public note: string, toSource: (octave: number, note: string) => string[]) {
-    this.noteName = note + octave;
-
-    this.src = toSource(octave, note);
+  constructor(public noteName: string, srcs: string[]) {
 
     this.sound = new Howl({
-      src: this.src,
+      src: srcs,
       preload: false
     });
 
-    console.log(this.noteName + ' == ' + this.src);
-
+    console.log(this.noteName + ' == ' + srcs);
   }
 
   public play(): number {
@@ -42,47 +31,78 @@ export class Octave {
 
 }
 
-export class Octaves {
 
-  private octavesMap = new Map<string, Octave>();
-  private octavesArr: Octave[] = [];
+export class MusicalNotes {
+
   private notes: string[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
+  private noteMap = new Map<string, MusicalNote>();
+
   constructor(toSource: (octave: number, note: string) => string[]) {
-    this.initializeOctaves(toSource);
+    this.initializeNotes(toSource);
   }
 
-  private initializeOctaves(toSource: (octave: number, note: string) => string[]) {
-    for (let i = 1; i <= 4; i++) {
-      this.notes.forEach((note: string, index: number) => {
-        const octave = new Octave(i, note, toSource);
-        this.octavesMap[octave.noteName] = octave;
-        this.octavesArr.push(octave);
+  private initializeNotes(toSource: (octave: number, note: string) => string[]) {
+
+    for (let octave = 0; octave <= 4; octave++) {
+
+      this.notes.forEach((note: string) => {
+
+        const noteName = note + octave;
+        const srcs = toSource(octave, note);
+
+        console.log("Loading notes " + noteName + " == " + srcs.length)
+
+        if ( srcs.length > 0) {
+          this.noteMap.set(noteName, new MusicalNote(noteName, srcs));
+        }
       });
     }
   }
 
-  find(noteName: string): Octave {
-    return this.octavesMap[noteName];
+  private getFretNoteName(octave: number, note: string, fretValue: number): string {
+    const noteIndex = this.notes.indexOf(note.toUpperCase());
+    if ( noteIndex > -1 && fretValue >= 0 && octave >= 0) {
+      const noteIndex2 = noteIndex + fretValue;
+      const octaveOffset = Math.floor(noteIndex2 / 12);
+      const noteOffset = noteIndex2 % 12;
+      return this.notes[noteOffset] + (octave + octaveOffset);
+    }
+    return '';
   }
 
 
-  get (index: number): Octave {
-    return this.octavesArr[index];
+  public getNoteName(tuning: Tuning, stringIndex: number, fretValue: number): string {
+
+    const gstring = tuning.guitarStrings[stringIndex];
+    if (gstring) {
+      return this.getFretNoteName(gstring.octave, gstring.openNote, fretValue);
+    } else {
+      return '';
+    }
+  }
+
+  public getNote(noteName: string): MusicalNote {
+    return this.noteMap.get(noteName);
   }
 }
 
+
 export class AudioChannel {
-  public sound: any; // AudioInstance
+  public sound: MusicalNote;
   public playid: number; // last Howl play id
   public finished = -1;  // expected end time for this channel
 }
 
 export class GuitarString {
-  constructor(public openString: string, public octaveNoteIndex: number) {
+  constructor(public readonly openNote: string, public readonly octave: number) {
   }
 }
 
+export class Tuning {
+  constructor(public readonly name: string, public readonly guitarStrings: GuitarString[]) {
+  }
+}
 
 export abstract class Instrument {
 
@@ -93,7 +113,7 @@ export abstract class Instrument {
     this.initializeAudioChannels();
   }
 
-  abstract getOctaves(): Octaves;
+  abstract getMusicalNotes(): MusicalNotes;
 
   private initializeAudioChannels() {
     for (let a = 0; a < this.channel_max; a++) {									// prepare the channels
@@ -101,41 +121,16 @@ export abstract class Instrument {
     }
   }
 
-
   public getNote(tuning: Tuning, stringIndex: number, fretValue: number): string {
-
-    const gstring = tuning.guitarStrings[stringIndex];
-    if (gstring) {
-      const octave = this.getOctaves().get(gstring.octaveNoteIndex + fretValue);
-      if (octave) {
-        return octave.noteName;
-      } else {
-        return '';
-      }
-    } else {
-      return '';
-    }
+    return this.getMusicalNotes().getNoteName(tuning, stringIndex, fretValue);
   }
 
-  public isBadNote(tuning: Tuning, stringIndex: number, fretValue: number): boolean {
-    const gstring = tuning.guitarStrings[stringIndex];
-    if (gstring) {
-      const octave = this.getOctaves().get(gstring.octaveNoteIndex + fretValue);
-      if (octave && octave.src.length > 0) {
-        return false;
-      }
-    }
-    return true;
-  }
+  public playSound(noteName: string, volume: number) {
 
-  public playSound(tuning: Tuning, stringIndex: number, fretValue: number) {
+    const note = this.getMusicalNotes().getNote(noteName);
 
-    const gstring = tuning.guitarStrings[stringIndex];
-    const noteName = this.getNote(tuning, stringIndex, fretValue);
-    const octave = this.getOctaves().find(noteName);
-
-    if ( this.isBadNote(tuning, stringIndex, fretValue) ) {
-      console.log("skipping playing bad note!");
+    if ( ! note ) {
+      console.log('Missing note ' + noteName + ' in instrument ' + this.name);
       return;
     }
 
@@ -146,26 +141,22 @@ export abstract class Instrument {
       const chnl_time = this.audiochannels[a].finished;
 
       if (chnl_time < cur_time) {			// is this channel finished?
-        if (octave) {
-          this.audiochannels[a].sound = octave;
-          this.audiochannels[a].playid = octave.play();
+        this.audiochannels[a].sound = note;
+        this.audiochannels[a].playid = note.play();
 
-          const vol = [0.4, 0.5, 0.6, 0.7, 0.9, 1.0][stringIndex];
-          this.audiochannels[a].sound.volume(vol, this.audiochannels[a].playid);
 
-          const max_duration = 10; // longest possible note is 5secs
+        this.audiochannels[a].sound.volume(volume, this.audiochannels[a].playid);
 
-          this.audiochannels[a].finished = cur_time + max_duration * 1000;
+        const max_duration = 10; // longest possible note is 5secs
 
-          found = 1;
-          break;
-        }
+        this.audiochannels[a].finished = cur_time + max_duration * 1000;
+
+        found = 1;
+        break;
       }
     }
     if (found === 0) {
-      console.log('"failed to play note');
+      console.log('failed to play note');
     }
   }
 }
-
-

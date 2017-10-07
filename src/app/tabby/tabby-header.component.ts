@@ -3,8 +3,8 @@ import {Song} from '../shared/song';
 
 import {List} from 'immutable';
 import {PlayerService} from '../shared/player.service';
-import {Instrument} from '../shared/tabsounds';
-import {Speed, Tuning} from '../shared/tabmusic';
+import {Instrument, Tuning} from '../shared/tabsounds';
+import {Speed} from '../shared/tabmusic';
 
 
 

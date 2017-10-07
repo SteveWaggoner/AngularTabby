@@ -2,7 +2,7 @@ import { Observable } from 'rxjs/Observable';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import {List} from 'immutable';
-import {Instrument, Octaves} from "./tabsounds";
+import {Instrument, MusicalNotes} from './tabsounds';
 
 export class InstrumentDb {
 
@@ -32,9 +32,9 @@ export class InstrumentDb {
 export class Ukulele extends Instrument {
 
   constructor() {
-    super("Ukulele");
+    super('Ukulele');
   }
-  private octaves = new Octaves(this.toSource);
+  private musicalNotes = new MusicalNotes(this.toSource);
 
   toSource(octave: number, note: string): string[] {
     const noteName = octave + note;
@@ -69,27 +69,30 @@ export class Ukulele extends Instrument {
     }
   }
 
-  public getOctaves(): Octaves {
-    return this.octaves;
+  public getMusicalNotes(): MusicalNotes {
+    return this.musicalNotes;
   }
 }
 
 
 export class Guitar extends Instrument {
 
-  private octaves = new Octaves(this.toSource);
+  private musicalNotes = new MusicalNotes(this.toSource);
 
   constructor() {
     super('Guitar');
   }
 
   private toSource(octave: number, note: string): string[] {
+
+    if ( octave < 1 || octave > 4 ) { return [];}
+
     const safe_noteName = octave + note.replace('#', 'sharp');
     return ['assets/sounds/guitar/' + safe_noteName + '.webm', 'assets/sounds/guitar/' + safe_noteName + '.mp3'];
   }
 
-  public getOctaves(): Octaves {
-    return this.octaves;
+  public getMusicalNotes(): MusicalNotes {
+    return this.musicalNotes;
   }
 
 }
