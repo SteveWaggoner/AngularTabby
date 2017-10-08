@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Song} from '../shared/song';
-import {Line} from '../shared/line';
-import {TabParser} from '../shared/tabparser';
+import {TabParser, TabLine} from '../shared/tabparser';
 import {PlayerService} from '../shared/player.service';
 
 @Component(
@@ -13,80 +12,50 @@ import {PlayerService} from '../shared/player.service';
       div.tabDisplay {
         font-size: 13px;
         font-family: monospace;
-        white-space: pre /* important !!! */
+        white-space: pre; /* important !!! */
+        background: url('assets/img/paper.png');
       }
 
       div.tabPlayerControls {
-        width: 100%;
-        background-color: #e0e0e0;
       }
 
       a.playerButton img {
         background-repeat: no-repeat;
-        width: 24px;
-        height: 24px;
+        width: 54px;
+        height: 54px;
         cursor: pointer;
         text-decoration: none;
         display: inline-block; /* for firefox since img has no src */
       }
 
       a.playerButton.play img {
-        background: url('assets/img/sprites.png') -4px -4px;
+        background: url('assets/img/icons.png') 0px 0px;
       }
 
       a.playerButton.pause img {
-        background: url('assets/img/sprites.png') -36px -4px;
+        background: url('assets/img/icons.png') -64px 0px;
       }
 
       a.playerButton.stop img {
-        background: url('assets/img/sprites.png') -4px 92px;
+        background: url('assets/img/icons.png') -128px 0px;
       }
 
-      a.playerButton.settings img {
-        background: url('assets/img/sprites.png') -36px 60px;
-      }
 
       a.playerButton.play.disabled img {
-        background: url('assets/img/sprites_gray.png') -4px -4px;
+        background: url('assets/img/icons_gray.png') -0px 0px;
       }
 
       a.playerButton.pause.disabled img {
-        background: url('assets/img/sprites_gray.png') -36px -4px;
+        background: url('assets/img/icons_gray.png') -64px 0px;
       }
 
       a.playerButton.stop.disabled img {
-        background: url('assets/img/sprites_gray.png') -4px 92px;
-      }
-
-      a.playerButton.minimize,
-      a.playerButton.window,
-      a.playerButton.maximize {
-        float: right;
-      }
-
-      a.playerButton.minimize img {
-        background: url('assets/img/sprites.png') -100px 92px;
-      }
-
-      a.playerButton.window img {
-        background: url('assets/img/sprites.png') -68px 92px;
-      }
-
-      a.playerButton.maximize img {
-        background: url('assets/img/sprites.png') -100px -4px;
+        background: url('assets/img/icons_gray.png') -128px 0px;
       }
 
       a img {
-         vertical-align: top;
-      }
-
-      div.tabDisplay.minimize {
-        display: none;
-      }
-
-      div.tabDisplay.window {
-        height: 10pc;
-        overflow-y: scroll;
+        vertical-align: top;
+        margin-top: 15px;
       }
 
     `],
@@ -96,9 +65,6 @@ import {PlayerService} from '../shared/player.service';
       <a class="playerButton play"  [ngClass]="{ 'disabled': playDisabled}" (click)="playerService.music.play()"><img></a>
       <a class="playerButton pause" [ngClass]="{ 'disabled': pauseDisabled}" (click)="playerService.music.pause()"><img></a>
       <a class="playerButton stop"  [ngClass]="{ 'disabled': stopDisabled}" (click)="playerService.music.stop()"><img></a>
-      <a class="playerButton minimize" (click)="resizeToMinimize()"><img></a>
-      <a class="playerButton window"   (click)="resizeToWindow()"><img></a>
-      <a class="playerButton maximize" (click)="resizeToMaximize()"><img></a>
     </div>
     <p>{{title}}</p>
     <div class="tabDisplay" [ngClass]="{ 'window': window, 'minimize': minimize}" ><app-tabby-line *ngFor="let line of lines" [line]="line" ></app-tabby-line></div>
@@ -108,15 +74,15 @@ import {PlayerService} from '../shared/player.service';
 export class TabbyMusicComponent implements OnInit {
 
   title = '';
-  lines: Line[] = [];
+  lines: TabLine[] = [];
 
   public playDisabled = false;
   public pauseDisabled = false;
   public stopDisabled = false;
-
+/*
   public window = false;
   public minimize = false;
-
+*/
   constructor(public playerService: PlayerService) {
     this.playerService.music.song$.subscribe((song) => { this.loadSong( song ); });
 
@@ -143,9 +109,7 @@ export class TabbyMusicComponent implements OnInit {
 
   ngOnInit() {
   }
-
-
-
+/*
   resizeToMinimize() {
     this.minimize = true;
     this.window = false;
@@ -160,4 +124,5 @@ export class TabbyMusicComponent implements OnInit {
     this.minimize = false;
     this.window = false;
   }
+ */
 }

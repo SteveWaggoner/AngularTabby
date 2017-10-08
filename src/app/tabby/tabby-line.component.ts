@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {Line} from '../shared/line';
+import {TabLine} from '../shared/tabparser';
 
 @Component(
   {
@@ -8,6 +8,6 @@ import {Line} from '../shared/line';
   }
 )
 export class TabbyLineComponent {
-  @Input() line: Line;
+  @Input() line: TabLine;
 }
 

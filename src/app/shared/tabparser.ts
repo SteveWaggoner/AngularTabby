@@ -1,14 +1,12 @@
-import {Note} from './note';
-import {Line} from './line';
 
 export class TabParser {
 
-  static parseLine(lineIndex: number, tabStripIndex: number, stringIndex: number, line: string): Note[] {
-    const notes: Note[] = [];
+  static parseLine(lineIndex: number, tabStripIndex: number, stringIndex: number, line: string): TabNote[] {
+    const notes: TabNote[] = [];
     const parts = line.split(/([0-9]+)/);
     let position = 0;
     parts.forEach((val, ndx) => {
-      const note = new Note(lineIndex, tabStripIndex, stringIndex, position, val);
+      const note = new TabNote(lineIndex, tabStripIndex, stringIndex, position, val);
       notes.push(note);
       position += val.length;
     });
@@ -38,7 +36,7 @@ export class TabParser {
     return tuning;
   }
 
-  static parseTabulature(tab: string): Line[] {
+  static parseTabulature(tab: string): TabLine[] {
 
     const lines = tab.split('\n');
 
@@ -48,7 +46,7 @@ export class TabParser {
 
     let tuning = '';
 
-    const parsedLines: Line[] = [];
+    const parsedLines: TabLine[] = [];
 
     lines.forEach((line, lineIndex) => {
 
@@ -74,15 +72,15 @@ export class TabParser {
       }
 
       const notes = TabParser.parseLine(lineIndex, tabStripIndex, stringIndex, line);
-      parsedLines.push(new Line(tabStripIndex, stringIndex, notes));
+      parsedLines.push(new TabLine(tabStripIndex, stringIndex, notes));
     });
 
     // update the node.index
-    let notes: Note[] = [];
+    let notes: TabNote[] = [];
     parsedLines.forEach((line, lineIndex) => {
       notes = notes.concat(line.notes);
     });
-    notes.sort(Note.compare);
+    notes.sort(TabNote.compare);
     notes.forEach((ni, index) => {
       ni.index = index;
     });
@@ -91,15 +89,15 @@ export class TabParser {
     return parsedLines;
   }
 
-  static generateNoteTable(lines: Line[]): Map<number, Map<number, Note>> {
+  static generateNoteTable(lines: TabLine[]): Map<number, Map<number, TabNote>> {
 
-    const lu = new Map<number, Map<number, Note>>();
+    const lu = new Map<number, Map<number, TabNote>>();
     lines.forEach((line, lineIndex) => {
 
       line.notes.forEach((ni, index) => {
 
         if (!lu.has(ni.lineIndex)) {
-          lu.set(ni.lineIndex, new Map<number, Note>());
+          lu.set(ni.lineIndex, new Map<number, TabNote>());
         }
         lu.get(ni.lineIndex).set(ni.position, ni);
       });
@@ -108,10 +106,10 @@ export class TabParser {
   }
 
 
-  static generateStepTable(lines: Line[]): Map<number, Note[]> {
+  static generateStepTable(lines: TabLine[]): Map<number, TabNote[]> {
 
     const prevStringStep: number[] = [0, 0, 0, 0, 0, 0];
-    const lu = new Map<number, Note[]>();
+    const lu = new Map<number, TabNote[]>();
     lines.forEach((line, lineIndex) => {
 
       line.notes.forEach((note, index) => {
@@ -133,3 +131,61 @@ export class TabParser {
   }
 
 }
+
+export class TabLine {
+
+  constructor(public tabStripIndex: number, public stringIndex: number, public notes: TabNote[]) {
+  }
+
+}
+
+export class TabNote {
+
+  public lineIndex = -1;
+  public tabStripIndex = -1;
+  public position = -1;
+  public stringIndex = -1;
+
+  public index = -1;
+
+  public fretValue = -1;
+  private noteType = -1; // 0 = note, 1 = text
+  public text = '';
+  public digits = 0;
+
+  constructor(lineIndex: number, tabStripIndex: number, stringIndex: number, position: number, text: string) {
+    this.lineIndex = lineIndex;
+    this.tabStripIndex = tabStripIndex;
+    this.stringIndex = stringIndex;
+    this.position = position;
+    this.text = text;
+    this.fretValue = parseInt(text, 10);
+    if ( ! isNaN(this.fretValue)) {
+      this.noteType = 0;
+      this.digits = text.length;
+    } else {
+      this.noteType = 1;
+    }
+  }
+
+  static compare(a: TabNote, b: TabNote): number {
+
+    if ( a.noteType === b.noteType ) {
+
+      if (a.tabStripIndex === b.tabStripIndex) {
+        if (a.position === b.position) {
+          return a.stringIndex - b.stringIndex;
+        } else {
+          return a.position - b.position;
+        }
+      } else {
+        return a.tabStripIndex - b.tabStripIndex;
+      }
+    } else {
+      return a.noteType - b.noteType;
+    }
+
+  }
+
+}
+

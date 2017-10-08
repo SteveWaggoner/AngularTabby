@@ -3,7 +3,6 @@ import {Song} from './song';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import {TabParser} from './tabparser';
-import {Line} from './line';
 
 
 export class Speed {
@@ -11,33 +10,22 @@ export class Speed {
   }
 }
 
-
 export class TabMusic {
 
   public readonly song$ = new BehaviorSubject<Song>(null);
-  public instrument$ = new BehaviorSubject<Instrument>(null);
-  public tuning$ = new BehaviorSubject<Tuning>(null);
-  public speed$ = new BehaviorSubject<Speed>(null);
-
-  public isPlaying$ = new BehaviorSubject<boolean>(false);
-  public isPaused$ = new BehaviorSubject<boolean>(false);
-
-  public noteIndex$ = new BehaviorSubject<number>(-1);
+  public readonly instrument$ = new BehaviorSubject<Instrument>(null);
+  public readonly tuning$ = new BehaviorSubject<Tuning>(null);
+  public readonly speed$ = new BehaviorSubject<Speed>(null);
+  public readonly isPlaying$ = new BehaviorSubject<boolean>(false);
+  public readonly isPaused$ = new BehaviorSubject<boolean>(false);
+  public readonly noteIndex$ = new BehaviorSubject<number>(-1);
 
   private interval = undefined;
 
-  private barTime = 3000; // speed of music
-//  private BAR_LENGTH = 18;   // how many steps in a bar?
-
-  private lines: Line[];
   private firstLine = '';
-  private steps;
-
   private step = 0;
   private stepCount = 0;
-  private tuningName = 'xx';
-
-  private isPaused = false;
+  private steps;
 
   constructor() {
     const me = this;
@@ -47,17 +35,13 @@ export class TabMusic {
       }
     });
 
-    this.isPaused$.subscribe((isPaused) => {
-      this.isPaused = isPaused;
-    });
-
     this.tuning$.next(this.tunings[0]);
     this.speed$.next(this.speeds[0]);
   }
 
   public readonly tunings = [
 
-    new Tuning('tuning EADGBE (Guitar)', [
+    new Tuning('Tuning EADGBE (Guitar)', [
       new GuitarString('e', 3),
       new GuitarString('B', 2),
       new GuitarString('G', 2),
@@ -66,21 +50,21 @@ export class TabMusic {
       new GuitarString('E', 1)
     ]),
 
-    new Tuning('tuning GCEA (Ukulele high-G)', [
+    new Tuning('Tuning GCEA (Ukulele high-G)', [
       new GuitarString('A', 1),
       new GuitarString('E', 1),
       new GuitarString('C', 1),
       new GuitarString('g', 1),
     ]),
 
-    new Tuning('tuning GCEA (Ukulele low-G)', [
+    new Tuning('Tuning GCEA (Ukulele low-G)', [
       new GuitarString('A', 1),
       new GuitarString('E', 1),
       new GuitarString('C', 1),
       new GuitarString('g', 0),
     ]),
 
-    new Tuning('tuning DGBE (Baritone Ukulele)', [
+    new Tuning('Tuning DGBE (Baritone Ukulele)', [
       new GuitarString('e', 2),
       new GuitarString('B', 1),
       new GuitarString('G', 1),
@@ -89,25 +73,30 @@ export class TabMusic {
 
   ];
 
-  public readonly speeds = [new Speed('speed auto', -1),
-    new Speed('speed 300 - super fast', 300),
-    new Speed('speed 600', 600),
-    new Speed('speed 900', 900),
-    new Speed('speed 1500', 1500),
-    new Speed('speed 2000 - normal', 2000),
-    new Speed('speed 3000', 3000),
-    new Speed('speed 5000', 5000),
-    new Speed('speed 7000', 7000),
-    new Speed('speed 9000 - super slow', 9000)];
+  public readonly speeds = [new Speed('Speed Auto', -1),
+    new Speed('Speed 300 - fast', 300),
+    new Speed('Speed 600', 600),
+    new Speed('Speed 900', 900),
+    new Speed('Speed 1500', 1500),
+    new Speed('Speed 2000 - Normal', 2000),
+    new Speed('Speed 3000', 3000),
+    new Speed('Speed 5000', 5000),
+    new Speed('Speed 7000', 7000),
+    new Speed('Speed 9000 - Slow', 9000)];
 
 
   getBarTime(): number {
-
     const speed = this.speed$.getValue();
+
+    console.log("getBarTime() speed = " + speed);
+    if(speed) {
+      console.log("getBarTime() speed.barTime = " + speed.barTime);
+    }
+
     if (speed && speed.barTime > 0) {
       return speed.barTime;
     } else {
-      return this.barTime;
+      return this.song$.getValue().bartime;
     }
   }
 
@@ -119,46 +108,36 @@ export class TabMusic {
     }
 
     // init song
-    this.lines = TabParser.parseTabulature(song.tabulature);
-    this.steps = TabParser.generateStepTable(this.lines);
-    this.barTime = song.bartime;
-
-    // switch tuning to match song
-    this.tuningName = TabParser.parseTuning(song.tabulature);
-
-    console.log('tuningName for ' + song.title + ' is ' + this.tuningName);
-
-    if ( this.tuningName.length > 0 ) {
-      this.tunings.forEach((tuning, n) => {
-
-        if ( this.tuning$.getValue().name.indexOf(this.tuningName) === -1) {
-
-          if (tuning.name.indexOf(this.tuningName) >= 0) {
-
-            console.log('switch to ' + tuning.name);
-
-            this.tuning$.next(tuning);
-          }
-        }
-
-      });
-    }
-
-
-    console.log('generateStepTable ' + this.steps);
+    const lines = TabParser.parseTabulature(song.tabulature);
+    this.steps = TabParser.generateStepTable(lines);
 
     // calculate total steps
-    this.stepCount = 0;
     this.firstLine = '';
-    this.lines.forEach((line, n) => {
+    lines.forEach((line, n) => {
       if (line.stringIndex === 1) {
         line.notes.forEach((note, ni) => {
           this.firstLine += note.text;
         });
       }
     });
-
     this.stepCount = this.firstLine.length;
+
+    // switch tuning to match song
+    const tuningName = TabParser.parseTuning(song.tabulature);
+    console.log('tuningName for ' + song.title + ' is ' + tuningName);
+    if ( tuningName.length > 0 ) {
+
+      this.tunings.forEach((tuning, n) => {
+
+        // if not already matching tuning and this is matching then switch
+        const currentTuningName = this.tuning$.getValue().name;
+        if ( currentTuningName.indexOf(tuningName) === -1 && tuning.name.indexOf(tuningName) >= 0) {
+          console.log('switch to ' + tuning.name);
+          this.tuning$.next(tuning);
+        }
+      });
+    }
+
   }
 
 
@@ -179,7 +158,7 @@ export class TabMusic {
 
     this.interval = setInterval(() => {
 
-      if (!this.isPaused) {
+      if (!this.isPaused$.getValue()) {
 
         // adjust speed if necessary
         this.checkStep();
@@ -246,9 +225,6 @@ export class TabMusic {
           instrument.playSound(noteName, vol);
 
           console.log('  noteIndex=' + this.noteIndex$.getValue() + '  ' + note.text);
-
-        } else {
-          console.log('huh?');
         }
       });
     } else {

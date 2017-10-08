@@ -1,7 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Note} from '../shared/note';
 import {PlayerService} from '../shared/player.service';
 import {Instrument, Tuning} from '../shared/tabsounds';
+import {TabNote} from '../shared/tabparser';
+
 
 @Component(
   {
@@ -110,7 +111,7 @@ import {Instrument, Tuning} from '../shared/tabsounds';
 )
 export class TabbyNoteComponent implements OnInit {
 
-  @Input() note: Note;
+  @Input() note: TabNote;
 
   noteName = '';
   badNote = false;

@@ -11,20 +11,35 @@ import {Speed} from '../shared/tabmusic';
 @Component(
   {
     selector: 'app-tabby-header',
+    styles: [`
+      .container {
+        align-items: flex-end;
+        display: flex;
+        justify-content: left;
+      }
+
+    `],
+
     template: `
-    <img src="assets/img/tabby_cat.png" alt="image" width="75" height="75">
-    <select class="form-control" name="song" [(ngModel)]="selectedSong" (change)="onSongChange($event)">
-      <option *ngFor="let song of songs " [ngValue]="song">{{song.title}}</option>
-    </select>
-    <select class="form-control" name="instrument" [(ngModel)]="selectedInstrument" (change)="onInstrumentChange($event)">
-      <option *ngFor="let instrument of instruments" [ngValue]="instrument">{{instrument.name}}</option>
-    </select>
-    <select class="form-control" name="tuning" [(ngModel)]="selectedTuning" (change)="onTuningChange($event)">
-      <option *ngFor="let tuning of playerService.music.tunings" [ngValue]="tuning">{{tuning.name}}</option>
-    </select>
-    <select class="form-control" name="speed" [(ngModel)]="selectedSpeed" (change)="onSpeedChange($event)">
-      <option *ngFor="let speed of playerService.music.speeds" [ngValue]="speed">{{speed.name}}</option>
-    </select>`
+  <div class="container">
+    <div>
+       <img src="assets/img/tabby_cat.png" alt="image" width="78" height="78">
+    </div>
+    <div>
+      <select class="form-control" name="song" [(ngModel)]="selectedSong" (change)="onSongChange($event)">
+        <option *ngFor="let song of songs " [ngValue]="song">{{song.title}}</option>
+      </select>
+      <select class="form-control" name="instrument" [(ngModel)]="selectedInstrument" (change)="onInstrumentChange($event)">
+        <option *ngFor="let instrument of instruments" [ngValue]="instrument">{{instrument.name}}</option>
+      </select>
+      <select class="form-control" name="tuning" [(ngModel)]="selectedTuning" (change)="onTuningChange($event)">
+        <option *ngFor="let tuning of playerService.music.tunings" [ngValue]="tuning">{{tuning.name}}</option>
+      </select>
+      <select class="form-control" name="speed" [(ngModel)]="selectedSpeed" (change)="onSpeedChange($event)">
+        <option *ngFor="let speed of playerService.music.speeds" [ngValue]="speed">{{speed.name}}</option>
+      </select>
+    </div>
+  </div>`
   }
 )
 export class TabbyHeaderComponent {
