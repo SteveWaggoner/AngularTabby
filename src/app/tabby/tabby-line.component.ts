@@ -7,7 +7,9 @@ import {TabLine} from '../shared/tabparser';
     template: `<app-tabby-note *ngFor="let note of line.notes" [note]="note" ></app-tabby-note><br>`
   }
 )
-export class TabbyLineComponent {
+export class TabbyLineComponent  {
+
   @Input() line: TabLine;
+
 }
 

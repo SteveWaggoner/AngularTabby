@@ -13,7 +13,7 @@ import {PlayerService} from '../shared/player.service';
         font-size: 13px;
         font-family: monospace;
         white-space: pre; /* important !!! */
-        background: url('assets/img/paper.png');
+        background: url('assets/img/paper.png') repeat-x;;
       }
 
       div.tabPlayerControls {

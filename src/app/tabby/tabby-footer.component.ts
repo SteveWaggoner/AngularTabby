@@ -6,11 +6,18 @@ import {PlayerService} from '../shared/player.service';
     selector: 'app-tabby-footer',
     template: `
     <p>Note Index: {{noteIndex}}</p>
-    <p>Notes Per Second: {{averageSpeed}}</p>
+    <p>Note Speed: {{averageSpeed}}</p>
     `
   }
 )
 export class TabbyFooterComponent {
+
+  private durations = [0, 0, 0];
+  private durationIndex = 0;
+  private lastNote: any = new Date();
+
+  public noteIndex = -1;
+  public averageSpeed = 0;
 
   private static sigFigs(n, sig) {
     const mult = Math.pow(10, sig - Math.floor(Math.log(n) / Math.LN10) - 1);
@@ -18,8 +25,13 @@ export class TabbyFooterComponent {
   }
 
   constructor(playerService: PlayerService) {
-    playerService.music.noteIndex$.subscribe((noteIndex) => {
-       this.noteIndex = noteIndex;
+    playerService.music.note$.subscribe((note) => {
+
+      if ( note ) {
+        this.noteIndex = note.index;
+      } else {
+        this.noteIndex = -1;
+      }
 
        // update average speed
        const currentTime: any = new Date();
@@ -33,17 +45,12 @@ export class TabbyFooterComponent {
          this.durations.forEach((d) => {
            total += d;
          });
-         this.averageSpeed = TabbyFooterComponent.sigFigs((total / this.durations.length) / 1000.0, 2)
+         this.averageSpeed = TabbyFooterComponent.sigFigs(total / this.durations.length , 2);
        }
 
     });
 
   }
 
-  private durations = [0,0,0];
-  private durationIndex = 0;
-  private lastNote: any = new Date();
 
-  public noteIndex = -1;
-  public averageSpeed = 0;
 }

@@ -2,7 +2,7 @@ import {GuitarString, Instrument, Tuning} from './tabsounds';
 import {Song} from './song';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
-import {TabParser} from './tabparser';
+import {TabNote, TabParser} from './tabparser';
 
 
 export class Speed {
@@ -18,7 +18,7 @@ export class TabMusic {
   public readonly speed$ = new BehaviorSubject<Speed>(null);
   public readonly isPlaying$ = new BehaviorSubject<boolean>(false);
   public readonly isPaused$ = new BehaviorSubject<boolean>(false);
-  public readonly noteIndex$ = new BehaviorSubject<number>(-1);
+  public readonly note$ = new BehaviorSubject<TabNote>(null);
 
   private interval = undefined;
 
@@ -74,7 +74,7 @@ export class TabMusic {
   ];
 
   public readonly speeds = [new Speed('Speed Auto', -1),
-    new Speed('Speed 300 - fast', 300),
+    new Speed('Speed 300 - Fast', 300),
     new Speed('Speed 600', 600),
     new Speed('Speed 900', 900),
     new Speed('Speed 1500', 1500),
@@ -89,7 +89,7 @@ export class TabMusic {
     const speed = this.speed$.getValue();
 
     console.log("getBarTime() speed = " + speed);
-    if(speed) {
+    if ( speed ) {
       console.log("getBarTime() speed.barTime = " + speed.barTime);
     }
 
@@ -143,8 +143,6 @@ export class TabMusic {
 
   play() {
     this.isPlaying$.next(true);
-
-    this.noteIndex$.next(-1);
     this.step = -1;
     this.configureInterval(1000); // start in 1sec
   }
@@ -215,7 +213,7 @@ export class TabMusic {
             stepCharLength = 2;
           }
 
-          this.noteIndex$.next(this.noteIndex$.getValue() + 1);
+          this.note$.next(note);
 
           const instrument = this.instrument$.getValue();
           const tuning = this.tuning$.getValue();
@@ -223,8 +221,6 @@ export class TabMusic {
           const noteName = instrument.getMusicalNotes().getNoteName(tuning, note.stringIndex, note.fretValue);
           const vol = [0.4, 0.5, 0.6, 0.7, 0.9, 1.0][note.stringIndex];
           instrument.playSound(noteName, vol);
-
-          console.log('  noteIndex=' + this.noteIndex$.getValue() + '  ' + note.text);
         }
       });
     } else {
@@ -237,7 +233,6 @@ export class TabMusic {
 
   stop() {
     this.step = 0;
-    this.noteIndex$.next(-1);
     clearInterval(this.interval);
 
     this.isPlaying$.next(false);

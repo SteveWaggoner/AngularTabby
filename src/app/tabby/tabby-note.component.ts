@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {PlayerService} from '../shared/player.service';
 import {Instrument, Tuning} from '../shared/tabsounds';
 import {TabNote} from '../shared/tabparser';
@@ -106,7 +106,8 @@ import {TabNote} from '../shared/tabparser';
       }
     `]
     ,
-    template: `<span [ngClass]="setClasses()" (click)="playNote($event)">{{note.text}}<span class="tooltiptext">{{noteName}}</span></span>`
+    template: `<span [ngClass]="setClasses()" (click)="playNote($event)">{{note.text}}<span class="tooltiptext">{{noteName}}</span></span>`,
+    changeDetection: ChangeDetectionStrategy.OnPush
   }
 )
 export class TabbyNoteComponent implements OnInit {
@@ -120,22 +121,41 @@ export class TabbyNoteComponent implements OnInit {
   currentTuning: Tuning = null;
   currentInstrument: Instrument = null;
 
-  constructor(private playerService: PlayerService) {
+  constructor(private cd: ChangeDetectorRef, private playerService: PlayerService) {
   }
 
   ngOnInit() {
-    this.playerService.music.noteIndex$.subscribe((noteIndex) => {
-      this.currentNoteIndex = noteIndex;
+
+    this.playerService.music.isPlaying$.subscribe((v) => {
+      this.currentNoteIndex = -1;
+      this.cd.markForCheck();
     });
+
+    this.playerService.music.note$.subscribe((n) => {
+
+      if ( n ) {
+        this.currentNoteIndex = n.index;
+        if (n.index === this.note.index ) {
+          this.cd.markForCheck();
+        }
+      } else {
+        this.currentNoteIndex = -1;
+        this.cd.markForCheck();
+      }
+    });
+
+    this.playerService.music.song$.subscribe((s) => { this.cd.markForCheck(); } );
 
     this.playerService.music.tuning$.subscribe((tuning) => {
       this.currentTuning = tuning;
       this.updateLabel();
+      this.cd.markForCheck();
     });
 
     this.playerService.music.instrument$.subscribe((instrument) => {
       this.currentInstrument = instrument;
       this.updateLabel();
+      this.cd.markForCheck();
     });
   }
 
